@@ -2,12 +2,25 @@ Package: MRlap
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Ninon",
+           family = "Mounier",
            role = c("aut", "cre"),
            email = "first.last@example.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))
 Description: What the package does (one paragraph).
-License: What license it uses
+License: GPL-2 | file LICENSE
 Encoding: UTF-8
 LazyData: true
+Imports: 
+    magrittr,
+    tibble,
+    dplyr,
+    data.table,
+    rlang,
+    stringr,
+    TwoSampleMR,
+    GenomicSEM
+Remotes: 
+  MRCIEU/TwoSampleMR,
+  MichelNivard/GenomicSEM
+RoxygenNote: 6.1.1

@@ -1,10 +1,10 @@
-###### Function to create a nice data.frame for any type of input GWAS######
+###### Function to create a nice data.frame for any type of input GWAS ######
 
 
 
 # #' Tidy input GWAS
 # #'
-# #' From the GWAS arguments (exposure/outcime) of the main MRlap function,
+# #' From the GWAS arguments (exposure/outcome) of the main MRlap function,
 # #' create a nice/tidy data.frame that can be used by all other functions.
 # #'
 # #' @inheritParams MRlap
@@ -18,12 +18,14 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
 
   GWASnames = list(SNPID = c("rsid", "snpid", "snp", "rnpid", "rs"),
+                   CHR = c("chr"),
+                   POS = c("pos"),
                    ALT = c("a1", "alt", "alts"),
                    REF = c("ref", "a0", "a2"),
                    BETA = c("beta", "b", "beta1"),
                    SE = c("se", "std"),
                    Z = c("z", "zscore"),
-                   N = c("n", "N"))
+                   N = c("n"))
 
 
   if(is.character(GWAS)) {
@@ -58,32 +60,35 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
   # here, we don't care, we need at least one
   tmp = paste0("   SNPID column, ok")
 
+  if(all(!HeaderGWAS %in% GWASnames[["CHR"]])) stop("no CHR column", call. = FALSE)
+  tmp = c(tmp, "CHR column, ok")
+
+  if(all(!HeaderGWAS %in% GWASnames[["POS"]])) stop("no POS column", call. = FALSE)
+  tmp = c(tmp, "POS column, ok")
+
   if(all(!HeaderGWAS %in% GWASnames[["ALT"]])) stop("no ALT column", call. = FALSE)
-  tmp = c(tmp, paste0("ALT column, ok"))
+  tmp = c(tmp, "ALT column, ok")
 
   if(all(!HeaderGWAS %in% GWASnames[["REF"]])) stop("no REF column", call. = FALSE)
-  tmp = c(tmp, paste0("REF column, ok"))
+  tmp = c(tmp, "REF column, ok")
 
 
   # if beta + se
   if(!all(!HeaderGWAS %in% GWASnames[["BETA"]]) & !all(!HeaderGWAS %in% GWASnames[["SE"]])){
-    if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
-      tmp = c(tmp, paste0("Z column, ok"))
-      getZ=FALSE
-    } else { # by default, use Z, only use beta/se if z not provided
+    if(all(!HeaderGWAS %in% GWASnames[["Z"]])){
+      tmp = c(tmp, "BETA column, ok")
+      tmp = c(tmp, "SE column, ok")
       getZ=TRUE
+    } else if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
+      tmp = c(tmp, "Z column, ok")
+      getZ=FALSE
     }
-
-    tmp = c(tmp, paste0("BETA column, ok"))
-    tmp = c(tmp, paste0("SE column, ok"))
-  } else if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
-    tmp = c(tmp, paste0("Z column, ok"))
   } else {
     stop("no effect (BETA/SE or Z) column(s)", call. = FALSE)
   }
 
   if(all(!HeaderGWAS %in% GWASnames[["N"]])) stop("no N column", call. = FALSE)
-  tmp = c(tmp, paste0("N column, ok"))
+  tmp = c(tmp, paste0("N column, ok \n"))
 
 
   if(verbose) cat(paste(tmp, collapse= " - "))
@@ -95,12 +100,12 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
   # if headers ok, and file or data.frame get GWASData
   if(is.character(GWAS)) {
     # Get the full data
-    GWASData = as_tibble(data.table::fread(GWAS, showProgress = FALSE, data.table=F))
+    GWASData = tibble::as_tibble(data.table::fread(GWAS, showProgress = FALSE, data.table=F))
     attributes(GWASData)$GName = basename(GWAS)
 
   } else if(is.data.frame(GWAS)){ # if data.frame
     # add attribute GName to the data.frame, to be re-used in other subfunctions
-    GWASData=as_tibble(GWAS)
+    GWASData=tibble::as_tibble(GWAS)
     rm(GWAS)
   }
 
@@ -108,6 +113,10 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
   # use col numbers because of different lower/upper possibilities
   SNPID = match(HeaderGWAS, GWASnames[["SNPID"]])
   SNPID = which(!is.na(SNPID))[1]
+  CHR = match(HeaderGWAS, GWASnames[["CHR"]])
+  CHR = which(!is.na(CHR))[1]
+  POS = match(HeaderGWAS, GWASnames[["POS"]])
+  POS = which(!is.na(POS))[1]
   ALT = match(HeaderGWAS, GWASnames[["ALT"]])
   ALT = which(!is.na(ALT))[1]
   REF = match(HeaderGWAS, GWASnames[["REF"]])
@@ -122,24 +131,32 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
   N = which(!is.na(N))[1]
 
 
-  colNumbers = c(SNPID, ALT, REF, BETA, SE, ZSTAT, N)
-  colNames = c("rsid", "alt", "ref", "beta", "se", "z", "N")
+  colNumbers = c(SNPID, CHR, POS, ALT, REF, BETA, SE, ZSTAT, N)
+  colNames = c("rsid", "chr", "pos", "alt", "ref", "beta", "se", "z", "N")
   colNames = colNames[!is.na(colNumbers)]
   colNumbers = colNumbers[!is.na(colNumbers)]
 
 
   GWASData %>%
-    select(all_of(colNumbers)) %>%
+    dplyr::select(dplyr::all_of(colNumbers)) %>%
     stats::setNames(colNames) -> GWASData_clean
 
   #if no Z, but BETA and SE, calculate Z
   if(getZ){
     GWASData_clean %>%
-      mutate(z_obs = .data$beta/.data$se) -> GWASData_clean
+      dplyr::mutate(z = .data$beta/.data$se,
+             beta=NULL, se=NULL) -> GWASData_clean
+  } else {
+    GWASData_clean %>%
+      dplyr::mutate(beta=NULL, se=NULL) -> GWASData_clean
   }
 
+  # Get standardised effects for MR
+  # + LDSC needs a p-value column
+
   GWASData_clean %>%
-    mutate(std_beta = Z/sqrt(N)) -> GWASData_clean
+    dplyr::mutate(std_beta = .data$z/sqrt(.data$N),
+           p = 2*stats::pnorm(-abs(.data$z))) -> GWASData_clean
 
   res=GWASData_clean
   return(res)
