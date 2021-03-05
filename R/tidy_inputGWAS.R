@@ -17,7 +17,7 @@
 tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
   if(verbose) cat("# Preparation of the data... \n")
-
+  print("use Z instead of z")
 
   GWASnames = list(SNPID = c("rsid", "snpid", "snp", "rnpid", "rs"),
                    CHR = c("chr"),
