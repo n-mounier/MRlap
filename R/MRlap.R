@@ -58,6 +58,7 @@ MRlap <- function(exposure,
                   sn=10000,
                   save_logfiles = FALSE,
                   verbose = TRUE) {
+  print("use Z instead of z")
 
 
   # Path where the analysis has been launched
