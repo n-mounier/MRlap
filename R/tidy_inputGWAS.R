@@ -7,7 +7,7 @@
 #' From the GWAS arguments (exposure/outcome) of the main MRlap function,
 #' create a nice/tidy data.frame that can be used by all other functions.
 #'
-#' @param GWAS
+#' @param GWAS xx
 #'
 #' @inheritParams MRlap
 #' @export

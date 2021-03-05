@@ -8,9 +8,11 @@ run_LDSC(exposure_data, exposure_name, outcome_data, outcome_name, ld, hm3,
   save_logfiles, verbose)
 }
 \arguments{
+\item{exposure_data}{xx}
+
 \item{exposure_name}{The name of the exposure trait, \code{default="exposure"} (character)}
 
-\item{outcome_data}{}
+\item{outcome_data}{xx}
 
 \item{outcome_name}{The name of the outcome trait, \code{default="outcome"} (character)}
 

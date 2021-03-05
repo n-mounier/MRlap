@@ -9,7 +9,9 @@ run_MR(exposure_data, outcome_data, MR_threshold = 5e-08,
   verbose = TRUE)
 }
 \arguments{
-\item{outcome_data}{}
+\item{exposure_data}{xx}
+
+\item{outcome_data}{xx}
 
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=5e-8} (numeric)}

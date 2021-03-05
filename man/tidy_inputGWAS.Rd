@@ -7,7 +7,7 @@
 tidy_inputGWAS(GWAS, verbose = FALSE)
 }
 \arguments{
-\item{GWAS}{}
+\item{GWAS}{xx}
 
 \item{verbose}{A logical indicating if information on progress should be reported,
 \code{default=TRUE}}

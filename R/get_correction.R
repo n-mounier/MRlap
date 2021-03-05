@@ -7,16 +7,16 @@
 #' Calculate corrected causal effect estimate (SE) and the covariance between
 #' observed and corrected effects, and test for the difference between the two
 #'
-#' @param IVs
-#' @param lambda
-#' @param lambda_se
-#' @param h2_LDSC
-#' @param h2_LDSC_se
-#' @param alpha_obs
-#' @param alpha_obs_se
-#' @param n_exp
-#' @param n_out
-#' @param M
+#' @param IVs xx
+#' @param lambda xx
+#' @param lambda_se xx
+#' @param h2_LDSC xx
+#' @param h2_LDSC_se xx
+#' @param alpha_obs xx
+#' @param alpha_obs_se xx
+#' @param n_exp xx
+#' @param n_out xx
+#' @param M xx
 #'
 #' @inheritParams MRlap
 #' @export

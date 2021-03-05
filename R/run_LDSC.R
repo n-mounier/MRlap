@@ -7,8 +7,8 @@
 #' Use GenomicSEM to perform cross-trait LDSC analysis and returns
 #' the heritability of the exposure (SE) and the cross-trait intercept (SE)
 #'
-#' @param exposure_data
-#' @param outcome_data
+#' @param exposure_data xx
+#' @param outcome_data xx
 #'
 #' @inheritParams MRlap
 #' @export
