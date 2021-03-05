@@ -8,6 +8,9 @@
 #' but also M (number of instruments), mean sample size for exposure / outcome
 #' and the set of IVs used
 #'
+#' @param exposure_data
+#' @param outcome_data
+#'
 #' @inheritParams MRlap
 #' @export
 

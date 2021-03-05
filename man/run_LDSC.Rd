@@ -10,6 +10,8 @@ run_LDSC(exposure_data, exposure_name, outcome_data, outcome_name, ld, hm3,
 \arguments{
 \item{exposure_name}{The name of the exposure trait, \code{default="exposure"} (character)}
 
+\item{outcome_data}{}
+
 \item{outcome_name}{The name of the outcome trait, \code{default="outcome"} (character)}
 
 \item{ld}{The path to the folder in which the LD scores used in the analysis are located.

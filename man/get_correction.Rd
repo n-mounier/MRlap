@@ -8,6 +8,8 @@ get_correction(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs,
   alpha_obs_se, n_exp, n_out, M, MR_threshold, verbose, sn = 100)
 }
 \arguments{
+\item{M}{}
+
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=5e-8} (numeric)}
 
