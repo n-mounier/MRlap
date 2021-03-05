@@ -62,7 +62,6 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
   theta = c(IVs$std_beta.exp,h2_LDSC)
   res_genA = get_geneticArchitecture(theta, n_exp, M, Tr)
 
-  print(res_genA)
   get_alpha <- function(n_exp, lambdaPrime, pi_x, sigma, alpha_obs, Tr){
 
     A = stats::pnorm( - Tr / sqrt(1 + n_exp * sigma^2) )
