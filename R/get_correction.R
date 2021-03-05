@@ -38,7 +38,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     h2_LDSC = theta[length(theta)]
     effects = theta[-length(theta)]
     sumBeta2 = sum(effects^2)
-    nSP = 50
+    nSP = 5 # seems enough! convergence is very good, for all starting points
     Res_SP = data.frame(SP = 1:nSP,
                         SP_pi = NA_real_,
                         diff = NA_real_,
@@ -46,8 +46,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
 
     for(i in 1:nSP){
       theta = 3 * 10^(stats::runif(1, -7, -1))
-
-      res_optim = stats::optimise(get_pi, interval=c(1e-7, 0.2),
+      res_optim = stats::optimise(get_pi, interval=c(1e-7, 0.3),
                            sumbeta2=sumBeta2, Tr=Tr, n_exp=n_exp, h2_LDSC=h2_LDSC, M=M, tol = 1e-6)
 
       Res_SP[i, 2:4] = c(theta, res_optim$objective, res_optim$minimum)
