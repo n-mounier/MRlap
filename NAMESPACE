@@ -2,5 +2,9 @@
 
 export("%>%")
 export(MRlap)
+export(get_correction)
+export(run_LDSC)
+export(run_MR)
+export(tidy_inputGWAS)
 importFrom(magrittr,"%>%")
 importFrom(rlang,.data)
