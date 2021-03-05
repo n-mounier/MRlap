@@ -162,6 +162,10 @@ MRlap <- function(exposure,
   if(verbose) cat("Runtime of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
 
 
+  # results -> list of 3
+  # [[1]] "correction"
+  # [[2]] "LDsc" : h2X / seh2X / h2Y / seh2Y /
+  # [[3]] "GeneticArchitecture" : pi / sigma
   results=with(c(MR_results, correction_results),
                list("observed_effect" = alpha_obs,
                     "observed_effect_se" = alpha_obs_se,

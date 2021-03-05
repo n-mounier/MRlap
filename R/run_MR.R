@@ -33,7 +33,7 @@ run_MR <- function(exposure_data,
   if(!is.null(MR_reverse)){
     reverse_t_threshold  =  stats::qnorm(MR_reverse)
     data_thresholded %>%
-      dplyr::filter( ( abs(.data$z.exp) - abs(.data$z.out)) /
+      dplyr::filter( ( abs(.data$std_beta.exp) - abs(.data$std_beta.out)) /
                        sqrt(1/.data$N.exp + 1/.data$N.out) > reverse_t_threshold) -> data_thresholded_filtered
     if(verbose) cat("   ", nrow(data_thresholded)-nrow(data_thresholded_filtered), "IVs excluded - more strongly associated with the outcome than with the exposure, p <", format(MR_reverse, scientific = T), "\n")
     data_thresholded = data_thresholded_filtered

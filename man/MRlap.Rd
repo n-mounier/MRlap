@@ -6,8 +6,8 @@
 \usage{
 MRlap(exposure, exposure_name = NULL, outcome, outcome_name = NULL, ld,
   hm3, MR_threshold = 5e-08, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_reverse = 0.001, save_logfiles = FALSE,
-  verbose = TRUE)
+  MR_pruning_LD = 0, MR_reverse = 0.001, sn = 10000,
+  save_logfiles = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{exposure}{The path to the file containing the GWAS summary statistics for the exposure,
@@ -35,7 +35,9 @@ than 1e-5, \code{default=5e-8} (numeric)}
 \item{MR_pruning_LD}{The LD threshold used for pruning MR instruments, should be between 0 and 1
 (if 0, distance-based pruning is used), \code{default=0} (numeric)}
 
-\item{MR_reverse}{The}
+\item{MR_reverse}{The ,\code{default=1e-3} (numeric)}
+
+\item{sn}{The \code{default=10,000} (numeric)}
 
 \item{save_logfiles}{A logical indicating if log files from LDSC should be saved,
 \code{default=FALSE}}

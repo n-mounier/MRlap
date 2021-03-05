@@ -132,7 +132,7 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
 
   colNumbers = c(SNPID, CHR, POS, ALT, REF, BETA, SE, ZSTAT, N)
-  colNames = c("rsid", "chr", "pos", "alt", "ref", "beta", "se", "z", "N")
+  colNames = c("rsid", "chr", "pos", "alt", "ref", "beta", "se", "Z", "N")
   colNames = colNames[!is.na(colNumbers)]
   colNumbers = colNumbers[!is.na(colNumbers)]
 
@@ -144,7 +144,7 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
   #if no Z, but BETA and SE, calculate Z
   if(getZ){
     GWASData_clean %>%
-      dplyr::mutate(z = .data$beta/.data$se,
+      dplyr::mutate(Z = .data$beta/.data$se,
              beta=NULL, se=NULL) -> GWASData_clean
   } else {
     GWASData_clean %>%
@@ -155,8 +155,8 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
   # + LDSC needs a p-value column
 
   GWASData_clean %>%
-    dplyr::mutate(std_beta = .data$z/sqrt(.data$N),
-           p = 2*stats::pnorm(-abs(.data$z))) -> GWASData_clean
+    dplyr::mutate(std_beta = .data$Z/sqrt(.data$N),
+           p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean
 
   res=GWASData_clean
   return(res)
