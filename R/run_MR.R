@@ -2,13 +2,13 @@
 
 
 
-# #' Run MR
-# #'
-# #' Use TwoSampleMR to perform IVW-MR and returns causal effect estimate (SE)
-# #' but also M (number of instruments), mean sample size for exposure / outcome
-# #' and the set of IVs used
-# #'
-# #' @inheritParams MRlap
+#' Run MR
+#'
+#' Use TwoSampleMR to perform IVW-MR and returns causal effect estimate (SE)
+#' but also M (number of instruments), mean sample size for exposure / outcome
+#' and the set of IVs used
+#'
+#' @inheritParams MRlap
 #' @export
 
 # NOT EXPORTED

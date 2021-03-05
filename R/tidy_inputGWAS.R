@@ -2,12 +2,12 @@
 
 
 
-# #' Tidy input GWAS
-# #'
-# #' From the GWAS arguments (exposure/outcome) of the main MRlap function,
-# #' create a nice/tidy data.frame that can be used by all other functions.
-# #'
-# #' @inheritParams MRlap
+#' Tidy input GWAS
+#'
+#' From the GWAS arguments (exposure/outcome) of the main MRlap function,
+#' create a nice/tidy data.frame that can be used by all other functions.
+#'
+#' @inheritParams MRlap
 #' @export
 
 # NOT EXPORTED

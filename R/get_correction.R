@@ -2,12 +2,12 @@
 
 
 
-# #' Get correction
-# #'
-# #' Calculate corrected causal effect estimate (SE) and the covariance between
-# #' observed and corrected effects, and test for the difference between the two
-# #'
-# #' @inheritParams MRlap
+#' Get correction
+#'
+#' Calculate corrected causal effect estimate (SE) and the covariance between
+#' observed and corrected effects, and test for the difference between the two
+#'
+#' @inheritParams MRlap
 #' @export
 
 # NOT EXPORTED

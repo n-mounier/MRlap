@@ -2,12 +2,12 @@
 
 
 
-# #' Run LDSC
-# #'
-# #' Use GenomicSEM to perform cross-trait LDSC analysis and returns
-# #' the heritability of the exposure (SE) and the cross-trait intercept (SE)
-# #'
-# #' @inheritParams MRlap
+#' Run LDSC
+#'
+#' Use GenomicSEM to perform cross-trait LDSC analysis and returns
+#' the heritability of the exposure (SE) and the cross-trait intercept (SE)
+#'
+#' @inheritParams MRlap
 #' @export
 
 # NOT EXPORTED
