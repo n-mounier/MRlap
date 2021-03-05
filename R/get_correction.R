@@ -8,6 +8,8 @@
 # #' observed and corrected effects, and test for the difference between the two
 # #'
 # #' @inheritParams MRlap
+#' @export
+
 # NOT EXPORTED
 
 get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,

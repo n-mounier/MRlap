@@ -9,6 +9,8 @@
 # #' and the set of IVs used
 # #'
 # #' @inheritParams MRlap
+#' @export
+
 # NOT EXPORTED
 
 

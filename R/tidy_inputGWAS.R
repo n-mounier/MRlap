@@ -8,6 +8,8 @@
 # #' create a nice/tidy data.frame that can be used by all other functions.
 # #'
 # #' @inheritParams MRlap
+#' @export
+
 # NOT EXPORTED
 
 

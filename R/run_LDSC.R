@@ -8,6 +8,8 @@
 # #' the heritability of the exposure (SE) and the cross-trait intercept (SE)
 # #'
 # #' @inheritParams MRlap
+#' @export
+
 # NOT EXPORTED
 
 run_LDSC <- function(exposure_data,
