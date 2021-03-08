@@ -11,8 +11,7 @@
 #' @param outcome_data xx
 #'
 #' @inheritParams MRlap
-#' @export
-
+# #' @export
 # NOT EXPORTED
 
 run_LDSC <- function(exposure_data,
@@ -68,6 +67,21 @@ run_LDSC <- function(exposure_data,
   output = readLines(paste0(c(traits, "ldsc.log"), collapse="_"))
   gcov_int_SE = as.numeric(stringr::str_replace(stringr::str_split(output[stringr::str_detect(output, "Cross trait Intercept")], "\\(" )[[1]][2], "\\)", ""))
 
+  # other parameters estimates to report
+  int_exp = LDSCoutput$I[1,1]
+  int_out = LDSCoutput$I[2,2]
+
+  h2_out = as.numeric(LDSCoutput$S[2,2])
+  h2_out_SE = sqrt(LDSCoutput$V[3,3])
+
+  rgcov = LDSCoutput$S[1,2]
+  # what is reported by GenomicSEM is sigma_g : the covariance, need to be rescaled to get the correlation
+  rg = LDSCoutput$S[1,2]/sqrt(LDSCoutput$S[1,1]*LDSCoutput$S[2,2])
+  # what is reported by GenomicSEM is se(sigma_g)^2 with sigma_g being the covariance, not the correlation!
+  rgcov_SE= sqrt(LDSCoutput$V[2,2])
+
+
+
   if(verbose) cat("> Cleaning temporary files... \n")
   # exposure.tsv
   # exposure_munge.log
@@ -91,5 +105,12 @@ run_LDSC <- function(exposure_data,
   return(list("h2_LDSC" = h2_exp,
            "h2_LDSC_se" = h2_exp_SE,
            "lambda" = gcov_int,
-           "lambda_se" = gcov_int_SE))
+           "lambda_se" = gcov_int_SE,
+           "int_exp" = int_exp,
+           "int_out" = int_out,
+           "h2_out" = h2_out,
+           "h2_out_se" = h2_out_SE,
+           "rgcov" = rgcov,
+           "rgcov_se" = rgcov_SE,
+           "rg" = rg))
 }

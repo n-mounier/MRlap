@@ -19,8 +19,7 @@
 #' @param M xx
 #'
 #' @inheritParams MRlap
-#' @export
-
+# #' @export
 # NOT EXPORTED
 
 get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
@@ -151,5 +150,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
               "alpha_corrected_se" = se_cov[1],
               "cov_obs_corrected" = se_cov[2],
               "test_diff"=test_diff,
-              "p_diff"=p_diff))
+              "p_diff"=p_diff,
+              "pi_x" = res_genA[1],
+              "sigma2_x" = res_genA[2]^2))
 }

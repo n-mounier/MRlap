@@ -10,8 +10,7 @@
 #' @param GWAS xx
 #'
 #' @inheritParams MRlap
-#' @export
-
+##' @export
 # NOT EXPORTED
 
 

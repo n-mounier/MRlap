@@ -133,7 +133,8 @@ MRlap <- function(exposure,
   if(verbose) cat("<<< Performing cross-trait LDSC >>>  \n")
   # returns h2 exposure - SE h2 exposure - cross-trait intercept - SE cross-trait intercept
   LDSC_results = run_LDSC(exposure_data, exposure_name, outcome_data, outcome_name, ld, hm3, save_logfiles, verbose)
-  # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se
+  # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
+  #     int_exp, int_out,  h2_out, h2_out_se, rgcov, rgcov_se, rg
 
   # 2 : run IVW-MR
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
@@ -151,6 +152,7 @@ MRlap <- function(exposure,
                                       alpha_obs, alpha_obs_se,
                                       n_exp, n_out, M, MR_threshold, verbose, sn))
   # -> alpha_corrected, alpha_corrected_se, cov_obs_corrected, test_diff, p_diff
+  #    pi_x, sigma2_x
 
 
   tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
@@ -164,15 +166,36 @@ MRlap <- function(exposure,
 
 
   # results -> list of 3
-  # [[1]] "correction"
+  # [[1]] "MR correction"
   # [[2]] "LDsc" : h2X / seh2X / h2Y / seh2Y /
   # [[3]] "GeneticArchitecture" : pi / sigma
-  results=with(c(MR_results, correction_results),
+  results_MR=with(c(MR_results, correction_results),
                list("observed_effect" = alpha_obs,
                     "observed_effect_se" = alpha_obs_se,
                     "corrected_effect" = alpha_corrected,
                     "corrected_effect_se" = alpha_corrected_se,
                     "test_difference" = test_diff,
                     "p_difference" = p_diff))
+
+  results_LDSC=with(LDSC_results,
+                  list("h2_exp" = h2_LDSC ,
+                       "h2_exp_se" = h2_LDSC_se,
+                       "int_exp" = int_exp,
+                       "h2_out" = h2_out,
+                       "h2_out_se" = h2_out_se,
+                       "int_out" = int_out,
+                       "gcov" = rgcov,
+                       "gcov_se" = rgcov_se,
+                       "rg" = rg,
+                       "int_crosstrait" = lambda,
+                       "int_crosstrait_se" = lambda_se))
+
+  results_GeneticArchitecture=with(correction_results,
+                    list("polygenicity" = pi_x,
+                         "perSNP_heritability" = sigma2_x))
+
+  results = list(MRcorrection = results_MR,
+                 LDSC = results_LDSC,
+                 GeneticArchitecture = results_GeneticArchitecture)
   return(results)
 }

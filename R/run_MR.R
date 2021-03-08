@@ -12,8 +12,7 @@
 #' @param outcome_data xx
 #'
 #' @inheritParams MRlap
-#' @export
-
+# #' @export
 # NOT EXPORTED
 
 
