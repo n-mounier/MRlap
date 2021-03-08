@@ -55,8 +55,8 @@ You can install the current version of `MRlap` with:
 ```{r install-package, echo=TRUE, message=FALSE, results='hide'}
 # Directly install the package from github
 # install.packages("remotes")
-remotes::install_github("n-mounier/MRlap")
-library(MRlap)
+#remotes::install_github("n-mounier/MRlap")
+#library(MRlap)
 ```
 <!--- Note: using remotes instead of devtools leads to re-build the package
 and apparently, it may be a problem with R 3.4 and macOS, 

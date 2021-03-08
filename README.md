@@ -35,8 +35,8 @@ You can install the current version of `MRlap` with:
 ``` r
 # Directly install the package from github
 # install.packages("remotes")
-#remotes::install_github("n-mounier/MRlap")
-#library(MRlap)
+##remotes::install_github("n-mounier/MRlap")
+##library(MRlap)
 ```
 
 <!--- Note: using remotes instead of devtools leads to re-build the package
