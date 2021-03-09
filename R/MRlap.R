@@ -12,7 +12,7 @@
 #' @param outcome_name The name of the outcome trait, \code{default="outcome"} (character)
 #' @param ld The path to the folder in which the LD scores used in the analysis are located.
 #'        Expects LD scores formated as required by the original LD score regression software.  (character)
-#' @param hm3 The path to the folder in which the LD scores used in the analysis are located.
+#' @param hm3 The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
 #'        (character)
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=5e-8} (numeric)
@@ -36,8 +36,8 @@
 #' POS (position) should be :  \code{pos} \cr
 #' ALT (effect allele) should be : \code{a1}, \code{alt}, \code{alts} \cr
 #' REF (reference allele) should be : \code{a2}, \code{a0}, \code{ref} \cr
-#' Z (z-score) should be : \code{z}, \code{Z}, \code{zscore} \cr
-#' N (sample size) should be :  \code{n} \cr
+#' Z (z-score) should be : \code{Z}, \code{zscore} \cr
+#' N (sample size) should be :  \code{N} \cr
 #' If Z is not present, it can be calculated from BETA and SE. \cr
 #' BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
 #' SE should be : \code{se}, \code{std} \cr
