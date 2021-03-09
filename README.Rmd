@@ -139,9 +139,9 @@ Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs 
 ## Citation
 [//]:*******
 
-If you use the `MRlap` package, please cite:
+<!--- If you use the `MRlap` package, please cite:
 
-<!--- [Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
+[Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
 
 ## Contact
 <mounier.ninon@gmail.com>

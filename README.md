@@ -97,17 +97,48 @@ score regression software. Weights for the european population can be
 obtained by downloading the eur\_w\_ld\_chr folder in the link below
 (Note that these are the same weights provided by the original
 developers of LDSC):
-<https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v> - hm3 \> We
-suggest using an (UNZIPPED) file of HAPMAP3 SNPs with some basic
-cleaning applied (e.g., MHC region removed) that is supplied and created
-by the original LD score regression developers and available here:
-<https://data.broadinstitute.org/alkesgroup/LDSCORE/w_hm3.snplist.bz2>
+<https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v>
+
+  - hm3 \> We suggest using an (UNZIPPED) file of HAPMAP3 SNPs with some
+    basic cleaning applied (e.g., MHC region removed) that is supplied
+    and created by the original LD score regression developers and
+    available here:
+    <https://data.broadinstitute.org/alkesgroup/LDSCORE/w_hm3.snplist.bz2>
+
+### Analysis
+
+  - **Example A**
+
+<!-- end list -->
+
+``` r
+# Using simulated exposure/outcome data (1,150,000 SNPs - stored as data.frames)
+# MRlap()
+
+# MR instruments will be selected using default parameter (5e-8) and distance-pruned (500Kb),
+# No file will be saved.
+```
+
+  - **Example B**
+
+<!-- end list -->
+
+``` r
+# Using simulated exposure/outcome data (less SNPs - stored as data.frames)
+# MRlap()
+
+# MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=),
+# No file will be saved.
+```
 
 ### Results
 
 ##### Aditionnaly, if `save_logfiles=TRUE`, LDSC log files are created in the current working directory :
 
-  - **<exposure>.log** - log file
+  - **<exposure_name>.log** - exposure cleaning/munging log file  
+  - **<outcome_name>.log** - outcome cleaning/munging log file  
+  - \*\*<exposure_name>.sumstats.gz\_<outcome_name>.sumstats.gzldsc.log
+    - cross-trait LDSC log file
 
 ## Runtime
 
@@ -121,9 +152,9 @@ Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB
 
 ## Citation
 
-If you use the `MRlap` package, please cite:
+<!--- If you use the `MRlap` package, please cite:
 
-<!--- [Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
+[Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
 
 ## Contact
 
