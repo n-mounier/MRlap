@@ -138,10 +138,10 @@ SBP <- system.file("data/", "SBP_Data.tsv.gz", package="MRlap")
 
 # MR instruments will be selected using default parameter (5e-8) and distance-pruned (500Kb),
 # No file will be saved.
-A = MRlap(exposure = SmallExposure_Data,
-          exposure_name = "simulated_exposure",
-          outcome = SmallOutcome_Data,
-          outcome_name = "simulated_outcome",
+A = MRlap(exposure = BMI,
+          exposure_name = "BMI_100Ksample",
+          outcome = SBP,
+          outcome_name = "SBP_100Ksample",
           ld = "~/eur_w_ld_chr",
           hm3 = "~/w_hm3.noMHC.snplist")
 ```
@@ -201,7 +201,7 @@ A = MRlap(exposure = SmallExposure_Data,
 # Note that here the overlap is known (since we generated the data) but the MRlap
 # function works even the overlap is unkown (overlap is *not* a parameter of the function) 
 # as it uses cross-trait LDSC to approximate it
-# (~400,000 SNPs - stored as data.frames)
+# (~750,000 SNPs - stored as data.frames)
 
 # MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=0.05),
 # No file will be saved.
@@ -243,20 +243,20 @@ B = MRlap(exposure = SmallExposure_Data,
     ##  <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ##  <<< Running IVW-MR >>>   
     ##  > Identifying IVs...  
-    ##      106 IVs with p < 5e-10  
+    ##      331 IVs with p < 5e-10  
     ##      0 IVs excluded - more strongly associated with the outcome than with the exposure, p < 1e-03  
     ##     Pruning : distance :  500 Kb  - LD threshold :  0.05  
-    ##      32 IVs left after pruning  
+    ##      39 IVs left after pruning  
     ##  > Performing MR  
-    ##      IVW-MR observed effect: 0.251 ( 0.0242 ) 
+    ##      IVW-MR observed effect: 0.223 ( 0.0228 ) 
     ##  <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.236 ( 0.0277 ) 
-    ##      covariance between observed and corrected effect: 0.00067  
+    ##      corrected effect: 0.207 ( 0.0257 ) 
+    ##      covariance between observed and corrected effect: 0.000586  
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  41  second(s).
+    ##  Runtime of the analysis:  5  minute(s) and  48  second(s).
     ```
 
 </details>
@@ -270,11 +270,9 @@ B = MRlap(exposure = SmallExposure_Data,
 <ul>
 
 “observed\_effect” : IVW-MR observed causal effect estimate,  
-“observed\_effect\_se” : IVW-MR observed causal effect estimate standard
-error,  
+“observed\_effect\_se” : IVW-MR observed causal effect standard error,  
 “corrected\_effect” : corrected causal effect estimate,  
-“corrected\_effect\_se” : corrected causal effect estimate standard
-error,  
+“corrected\_effect\_se” : corrected causal effect standard error,  
 “test\_difference” : test statistic used to test for differences between
 observed and corrected effects,  
 “p\_difference” : p-value corresponding to the test statistic used to
@@ -288,15 +286,15 @@ test for differences between observed and corrected effects.
 
 “h2\_exp” : exposure heritability estimate,  
 “h2\_exp\_se” : exposure heritability standard error,  
-“int\_exp” : exposure intercept,  
+“int\_exp” : exposure intercept estimate,  
 “h2\_out” : outcome heritability estimate,  
 “h2\_out\_se” : outcome heritability standard error,  
-“int\_out” : outcome intercept,  
+“int\_out” : outcome intercept estimate,  
 “gcov” : genetic covariance estimate,  
-“gcov\_se” : genetic covariance estimate standard error,  
-“rg” : genetic correlation estimate, “int\_crosstrait” : cross-trait
-intercept estimate, “int\_crosstrait\_se”: cross-trait intercept
-estimate standard error.
+“gcov\_se” : genetic covariance standard error,  
+“rg” : genetic correlation estimate,  
+“int\_crosstrait” : cross-trait intercept estimate,  
+“int\_crosstrait\_se”: cross-trait intercept standard error.
 
 </ul>
 
@@ -361,6 +359,22 @@ unlist(A[["MRcorrection"]])
     ##     test_difference        p_difference 
     ##         -2.35838564          0.01835461
 
+``` r
+# in this case, we observed that the corrected effects points towards an underestimation
+# of the observed effect estimate obtained using IVW (because when there is no sample 
+# overlap Winner's curse and weak-instrument bias will bias the estimate towards the null)
+
+# LDSC results
+unlist(A[["LDSC"]])
+```
+
+    ##            h2_exp         h2_exp_se           int_exp            h2_out 
+    ##       0.243865854       0.010663133       1.019459090       0.140424951 
+    ##         h2_out_se           int_out              gcov           gcov_se 
+    ##       0.009745983       1.011189974       0.035547929       0.007089347 
+    ##                rg    int_crosstrait int_crosstrait_se 
+    ##       0.192095266      -0.001101472       0.006300000
+
   - **Example B**
 
 <!-- end list -->
@@ -370,39 +384,39 @@ unlist(A[["MRcorrection"]])
 B[["MRcorrection"]]$observed_effect
 ```
 
-    ## [1] 0.251392
+    ## [1] 0.2234165
 
 ``` r
 # corrected effect
 B[["MRcorrection"]]$corrected_effect
 ```
 
-    ## [1] 0.2358383
+    ## [1] 0.2065657
 
 ``` r
 # difference p-value
 B[["MRcorrection"]]$p_difference
 ```
 
-    ## [1] 1.070587e-05
+    ## [1] 8.260064e-13
 
 ``` r
-# LDSC results
-unlist(B[["LDSC"]])
+# in this case, we observed that the the observed effect estimate obtained using IVW 
+# is overestimated because of the sample overlap. The true causal effect used for 
+# simulating the data is 0.2 (bias for corrected effect is 3.5 folds lower).
+
+# Exposure genetic architecture (estimated to get corrected effects)
+unlist(B[["GeneticArchitecture"]])
 ```
 
-    ##            h2_exp         h2_exp_se           int_exp            h2_out 
-    ##       0.397445344       0.049379931       0.998226893       0.006929744 
-    ##         h2_out_se           int_out              gcov           gcov_se 
-    ##       0.023324039       0.994038341       0.073534339       0.020728556 
-    ##                rg    int_crosstrait int_crosstrait_se 
-    ##       1.401176698       0.361450785       0.006300000
+    ##        polygenicity perSNP_heritability 
+    ##        0.0008447576        0.0004078613
 
 ## Runtime
 
 Example A \~ 4 minutes 30 seconds
 
-Example B \~ 3 minutes 40 seconds
+Example B \~ 6 minutes
 
 The runtime can be influenced by the size of the summary statistics
 files, the approach used for pruning (distance vs LD) but also by `s`,
