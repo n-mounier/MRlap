@@ -4,7 +4,7 @@
 \name{SmallExposure_Data}
 \alias{SmallExposure_Data}
 \title{Exposure}
-\format{A data frame with 400000 rows and 13 variables:
+\format{A data frame with 750,000 rows and 13 variables:
 \describe{
   \item{chr}{chromosome}
   \item{rsid}{rsid of the SNP}

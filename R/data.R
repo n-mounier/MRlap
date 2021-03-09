@@ -2,7 +2,7 @@
 #'
 #' Subset of the original dataset containing the estimated effect of SNPs on the exposure
 #'
-#' @format A data frame with 400000 rows and 13 variables:
+#' @format A data frame with 750,000 rows and 13 variables:
 #' \describe{
 #'   \item{chr}{chromosome}
 #'   \item{rsid}{rsid of the SNP}
@@ -26,7 +26,7 @@
 #'
 #' Subset of the original dataset containing the estimated effect of SNPs on the outcome
 #'
-#' @format A data frame with 400000 rows and 13 variables:
+#' @format A data frame with 750,000 rows and 13 variables:
 #' \describe{
 #'   \item{chr}{chromosome}
 #'   \item{rsid}{rsid of the SNP}

@@ -7,8 +7,8 @@ library(tidyverse)
 Exposure_Data <- data.table::fread("~/Documents/SGG/Projects/SampleOverlap/Data/Simulations/noY/GWAS_X.tsv")
 Outcome_Data <- data.table::fread("~/Documents/SGG/Projects/SampleOverlap/Data/Simulations/noY/GWAS_Y100.tsv")
 
-# take 400,000 SNPs
-SNPs <- sample(x = 1:nrow(Exposure_Data), 400000)
+# take 750,000 SNPs
+SNPs <- sample(x = 1:nrow(Exposure_Data), 750000)
 
 Exposure_Data %>%
   slice(SNPs) -> SmallExposure_Data
@@ -47,9 +47,9 @@ saveRDS(A, file="~/Documents/SGG/Projects/MRlap/inst/Data/A.RDS")
 data("SmallExposure_Data")
 data("SmallOutcome_Data")
 
-B = MRlap(exposure = SmallExposure_Data,
+B = MRlap(exposure = Exposure_Data,
           exposure_name = "simulated_exposure",
-          outcome = SmallOutcome_Data,
+          outcome = Outcome_Data,
           outcome_name = "simulated_outcome",
           ld = "~/eur_w_ld_chr",
           hm3 = "~/w_hm3.noMHC.snplist",
@@ -58,5 +58,7 @@ B = MRlap(exposure = SmallExposure_Data,
 
 
 saveRDS(B, file="~/Documents/SGG/Projects/MRlap/inst/Data/B.RDS")
+
+
 
 
