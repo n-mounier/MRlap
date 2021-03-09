@@ -13,7 +13,7 @@ sticker(imgurl,
         s_x=0.95, s_y=1.05, s_width=0.95,
         filename="inst/Figures/logo.png", dpi=2000) --->
 
-<!--- :arrow_right: ESHG poster is available [here]().  --->
+<!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->
 
 :information\_source: `MRlap` is still under active development.
 
@@ -32,9 +32,9 @@ a significant difference, corrected effects should be preferred as they
 should be less biased, independently of the sample overlap.  
 This package builds up on the
 [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to
-perform cross-trait LD-score regression (LDSC) and the [`TwoSampleMR`]()
-R-package for inverse-variance weighted (IVW-)MR analysis (and
-instruments pruning).
+perform cross-trait LD-score regression (LDSC) and the
+[`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for
+inverse-variance weighted (IVW-)MR analysis (and instruments pruning).
 
 There is only one function available:
 
@@ -51,8 +51,8 @@ You can install the current version of `MRlap` with:
 ``` r
 # Directly install the package from github
 # install.packages("remotes")
-##remotes::install_github("n-mounier/MRlap")
-##library(MRlap)
+remotes::install_github("n-mounier/MRlap")
+library(MRlap)
 ```
 
 <!--- Note: using remotes instead of devtools leads to re-build the package
@@ -61,11 +61,13 @@ see https://stackoverflow.com/questions/43595457/alternate-compiler-for-installi
 
 ## Usage
 
-To run the analysis with `MRlap` different inputs are needed: \#\#\#\#
-1. The exposure and outcome GWAS summary statistics (`exposure` &
-`outcome`): Can be a regular (space/tab/comma-separated) file or a
-gzipped file (.gz) or a `data.frame`. Must contain the following
-columns, which can have alternative names (not case sensitive):  
+To run the analysis with `MRlap` different inputs are needed:
+
+#### 1\. The exposure and outcome GWAS summary statistics (`exposure` & `outcome`):
+
+Can be a regular (space/tab/comma-separated) file or a gzipped file
+(.gz) or a `data.frame`. Must contain the following columns, which can
+have alternative names (not case sensitive):  
 
 <ul>
 
@@ -91,19 +93,24 @@ Standard error: `se` or `std`
 #### 2\. The input files for LDSC (`ld` & `hm3`):
 
 These are needed by the
-[`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package.  
-\- ld: \> Expects LD scores formated as required by the original LD
-score regression software. Weights for the european population can be
-obtained by downloading the eur\_w\_ld\_chr folder in the link below
-(Note that these are the same weights provided by the original
-developers of LDSC):
-<https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v>
+[`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package.
 
-  - hm3 \> We suggest using an (UNZIPPED) file of HAPMAP3 SNPs with some
-    basic cleaning applied (e.g., MHC region removed) that is supplied
-    and created by the original LD score regression developers and
-    available here:
-    <https://data.broadinstitute.org/alkesgroup/LDSCORE/w_hm3.snplist.bz2>
+  - ld:
+
+> Expects LD scores formated as required by the original LD score
+> regression software. Weights for the european population can be
+> obtained by downloading the eur\_w\_ld\_chr folder in the link below
+> (Note that these are the same weights provided by the original
+> developers of LDSC):
+> <https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v>
+
+  - hm3:
+
+> We suggest using an (UNZIPPED) file of HAPMAP3 SNPs with some basic
+> cleaning applied (e.g., MHC region removed) that is supplied and
+> created by the original LD score regression developers and available
+> here:
+> <https://data.broadinstitute.org/alkesgroup/LDSCORE/w_hm3.snplist.bz2>
 
 ### Analysis
 
@@ -133,11 +140,44 @@ developers of LDSC):
 
 ### Results
 
+**`MRlap()`** returns a named list containing the following results:
+
+  - MRcorrection
+
+<ul>
+
+“observed\_effect” : IVW-MR observed causal effect estimate,  
+“observed\_effect\_se” : IVW-MR observed causal effect estimate standard
+error,  
+“corrected\_effect” : corrected causal effect estimate,  
+“corrected\_effect\_se” : corrected causal effect estimate standard
+error,  
+“test\_difference” : test statistic used to test for differences between
+observed and corrected effects,  
+“p\_difference” : p-value corresponding to the test statistic used to
+test for differences between observed and corrected effects. \<
+
+  - LDSC
+
+<ul>
+
+“h2\_exp” : exposure heritability estimate,  
+“h2\_exp\_se” : exposure heritability standard error,  
+“int\_exp” : exposure intercept,  
+“h2\_out” : outcome heritability estimate,  
+“h2\_out\_se” : outcome heritability standard error,  
+“int\_out” : outcome intercept,  
+“gcov” : genetic covariance estimate,  
+“gcov\_se” : genetic covariance estimate standard error,  
+“rg” : genetic correlation estimate, “int\_crosstrait” : cross-trait
+intercept estimate, “int\_crosstrait\_se”: cross-trait intercept
+estimate standard error. \<
+
 ##### Aditionnaly, if `save_logfiles=TRUE`, LDSC log files are created in the current working directory :
 
   - **<exposure_name>.log** - exposure cleaning/munging log file  
   - **<outcome_name>.log** - outcome cleaning/munging log file  
-  - \*\*<exposure_name>.sumstats.gz\_<outcome_name>.sumstats.gzldsc.log
+  - **<exposure_name>.sumstats.gz\_<outcome_name>.sumstats.gzldsc.log**
     - cross-trait LDSC log file
 
 ## Runtime
