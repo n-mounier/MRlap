@@ -25,8 +25,9 @@ sticker(imgurl,
 GWAS summary statistics. MR estimates can be subject to different types
 of biases due to the overlap between the exposure and outcome samples,
 the use of weak instruments and Winner’s curse. Our approach
-simultaneously accounts and corrects for all these biases. Estimating
-the corrected effect using our approach can be performed as a
+simultaneously accounts and corrects for all these biases, using
+cross-trait LD-score regression (LDSC) to approximate the overlap.
+Estimating the corrected effect using our approach can be performed as a
 sensitivity analysis: if the corrected effect do not significantly
 differ from the observed effect, then IVW-MR estimate can be safely
 used. However, when there is a significant difference, corrected effects
@@ -34,7 +35,7 @@ should be preferred as they should be less biased, independently of the
 sample overlap.  
 This package builds up on the
 [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to
-perform cross-trait LD-score regression (LDSC) and the
+perform cross-trait LDSC and the
 [`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for
 inverse-variance weighted (IVW-)MR analysis (and instruments pruning).
 
@@ -117,26 +118,32 @@ These are needed by the
 
 ### Analysis
 
+Before running the examples, please make sure to have downloaded the
+input files for LDSC. You may also need to modify the `ld` & `hm3`
+parameters to indicate the correct paths.
+
   - **Example A**
 
 <!-- end list -->
 
 ``` r
-# Using simulated exposure/outcome data 
-# ~100K samples for BMI/SBP, with 0% of sample overlap 
+# Using ~100K samples for BMI/SBP, with 0% of sample overlap
+# Note that here the overlap is known (since we generated the data) but the MRlap
+# function works even the overlap is unkown (overlap is *not* a parameter of the function) 
+# as it uses cross-trait LDSC to approximate it
 # (only weak-instrument bias and Winner's curse)
 # (1,150,000 SNPs - stored in gzipped files)
 BMI <- system.file("data/", "BMI_Data.tsv.gz", package="MRlap")
 SBP <- system.file("data/", "SBP_Data.tsv.gz", package="MRlap")
 
+# MR instruments will be selected using default parameter (5e-8) and distance-pruned (500Kb),
+# No file will be saved.
 A = MRlap(exposure = SmallExposure_Data,
           exposure_name = "simulated_exposure",
           outcome = SmallOutcome_Data,
           outcome_name = "simulated_outcome",
           ld = "~/eur_w_ld_chr",
           hm3 = "~/w_hm3.noMHC.snplist")
-# MR instruments will be selected using default parameter (5e-8) and distance-pruned (500Kb),
-# No file will be saved.
 ```
 
 <details>
@@ -190,9 +197,14 @@ A = MRlap(exposure = SmallExposure_Data,
 
 ``` r
 # Using simulated exposure/outcome data 
-# standard settings scenario, with 100% of sample overlap 
+# standard settings scenario, with 100% of sample overlap
+# Note that here the overlap is known (since we generated the data) but the MRlap
+# function works even the overlap is unkown (overlap is *not* a parameter of the function) 
+# as it uses cross-trait LDSC to approximate it
 # (~400,000 SNPs - stored as data.frames)
 
+# MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=0.05),
+# No file will be saved.
 B = MRlap(exposure = SmallExposure_Data,
           exposure_name = "simulated_exposure",
           outcome = SmallOutcome_Data,
@@ -201,8 +213,6 @@ B = MRlap(exposure = SmallExposure_Data,
           hm3 = "~/w_hm3.noMHC.snplist",
           MR_threshold = 5e-10,
           MR_pruning_LD = 0.05)
-# MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=0.05),
-# No file will be saved.
 ```
 
 <details>
@@ -398,9 +408,9 @@ The runtime can be influenced by the size of the summary statistics
 files, the approach used for pruning (distance vs LD) but also by `s`,
 the number of simulations used for the sampling strategy to estimate the
 variance of the corrected causal effect and the covariance between
-observed and corrected effects. However, reducing the value of `s` is
-strongly discouraged as it can lead to an innacurate estimation of the
-corrected effect standard error.
+observed and corrected effects (type `?MRlap` to get details). However,
+reducing the value of `s` is strongly discouraged as it can lead to an
+innacurate estimation of the corrected effect standard error.
 
 <font color="grey"><small> Results from analyses performed on a MacBook
 Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB
