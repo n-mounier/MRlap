@@ -2,6 +2,5 @@
 
 export("%>%")
 export(MRlap)
-export(tidy_inputGWAS)
 importFrom(magrittr,"%>%")
 importFrom(rlang,.data)
