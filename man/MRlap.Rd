@@ -6,7 +6,7 @@
 \usage{
 MRlap(exposure, exposure_name = NULL, outcome, outcome_name = NULL, ld,
   hm3, MR_threshold = 5e-08, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_reverse = 0.001, sn = 10000,
+  MR_pruning_LD = 0, MR_reverse = 0.001, s = 10000,
   save_logfiles = FALSE, verbose = TRUE)
 }
 \arguments{
@@ -32,12 +32,14 @@ than 1e-5, \code{default=5e-8} (numeric)}
 \item{MR_pruning_dist}{The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
 \code{default=500} (numeric)}
 
-\item{MR_pruning_LD}{The LD threshold used for pruning MR instruments, should be between 0 and 1
+\item{MR_pruning_LD}{The LD threshold (r2) used for pruning MR instruments, should be between 0 and 1
 (if 0, distance-based pruning is used), \code{default=0} (numeric)}
 
-\item{MR_reverse}{The ,\code{default=1e-3} (numeric)}
+\item{MR_reverse}{The p-value used to exclude MR instruments that are more strongly associated with the outcome
+than with the exposure,\code{default=1e-3} (numeric)}
 
-\item{sn}{The \code{default=10,000} (numeric)}
+\item{s}{The number of simulations used for sampling strategy to estimate the variance of the corrected causal
+effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)}
 
 \item{save_logfiles}{A logical indicating if log files from LDSC should be saved,
 \code{default=FALSE}}
@@ -46,8 +48,9 @@ than 1e-5, \code{default=5e-8} (numeric)}
 \code{default=TRUE}}
 }
 \description{
-Performs a cross-trait LD score regression, IVW-MR analysis and
-BLA BLA BLA CORRECTION!
+Performs cross-trait LD score regression, IVW-MR analysis and provide a correction
+that simultaneously accounts for biases due to the overlap between the exposure and
+outcome samples, the use of weak instruments and Winner’s curse.
 }
 \details{
 \code{exposure} and \code{outcome} are required arguments.
@@ -64,7 +67,7 @@ If Z is not present, it can be calculated from BETA and SE. \cr
 BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
 SE should be : \code{se}, \code{std} \cr
 
-Setting \code{sn} to a smaller value is strongly discouraged, it can lead to an innacurate
-estimates of the corrected effect SE, therefore affecting the results of the difference testing
+Setting \code{s} to a smaller value is strongly discouraged, it can lead to an innacurate
+estimatation of the corrected effect SE, therefore affecting the results of the difference testing
 between observed and corrected effects.
 }

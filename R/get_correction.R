@@ -2,28 +2,28 @@
 
 
 
-#' Get correction
-#'
-#' Calculate corrected causal effect estimate (SE) and the covariance between
-#' observed and corrected effects, and test for the difference between the two
-#'
-#' @param IVs xx
-#' @param lambda xx
-#' @param lambda_se xx
-#' @param h2_LDSC xx
-#' @param h2_LDSC_se xx
-#' @param alpha_obs xx
-#' @param alpha_obs_se xx
-#' @param n_exp xx
-#' @param n_out xx
-#' @param M xx
-#'
-#' @inheritParams MRlap
-# #' @export
+# #' Get correction
+# #'
+# #' Calculate corrected causal effect estimate (SE) and the covariance between
+# #' observed and corrected effects, and test for the difference between the two
+# #'
+# #' @param IVs xx
+# #' @param lambda xx
+# #' @param lambda_se xx
+# #' @param h2_LDSC xx
+# #' @param h2_LDSC_se xx
+# #' @param alpha_obs xx
+# #' @param alpha_obs_se xx
+# #' @param n_exp xx
+# #' @param n_out xx
+# #' @param M xx
+# #'
+# #' @inheritParams MRlap
+# #' # @export
 # NOT EXPORTED
 
 get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
-                           alpha_obs, alpha_obs_se, n_exp, n_out, M, MR_threshold, verbose, sn=100){
+                           alpha_obs, alpha_obs_se, n_exp, n_out, M, MR_threshold, verbose, s=10000){
 
 
   Tr = -stats::qnorm(MR_threshold/2)
@@ -99,20 +99,20 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
 
 
   ## get SE and covariance
-  get_correctedSE <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, sn=100){
+  get_correctedSE <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s=10000){
 
 
     effects = IVs$std_beta.exp
     effects_se = 1/sqrt(IVs$N.exp)
 
     # simulate 500 lambda
-    L = matrix(stats::rnorm(sn, lambda, lambda_se), ncol=sn)/sqrt(n_exp*n_out)
+    L = matrix(stats::rnorm(s, lambda, lambda_se), ncol=s)/sqrt(n_exp*n_out)
 
     # simulate 500 "instruments sets" - each column = 1 simulation
-    E =  matrix(stats::rnorm(nrow(IVs)*sn, effects, effects_se), ncol= sn)
+    E =  matrix(stats::rnorm(nrow(IVs)*s, effects, effects_se), ncol= s)
 
     # simulate 500 h2_LDSC
-    H = matrix(stats::rnorm(sn, h2_LDSC, h2_LDSC_se), ncol=sn)
+    H = matrix(stats::rnorm(s, h2_LDSC, h2_LDSC_se), ncol=s)
 
     # effects + h2 are needed to get pi and therefore sigma
     D = rbind(E, H)
@@ -120,7 +120,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr))
 
     # simulate 500 alpha_obs
-    B =  matrix(stats::rnorm(sn, alpha_obs, alpha_obs_se), ncol= sn)
+    B =  matrix(stats::rnorm(s, alpha_obs, alpha_obs_se), ncol= s)
 
 
 
@@ -134,7 +134,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     return(c(stats::sd(all_params$corrected), stats::cov(all_params$alpha, all_params$corrected)))
   }
 
-  se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, sn)
+  se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s)
 
   if(verbose) cat("   ",  "corrected effect:", format(alpha_corrected, digits = 3), "(", format(se_cov[1], digits=3), ")\n")
   if(verbose) cat("   ",  "covariance between observed and corrected effect:", format(se_cov[2], digits=3), "\n")

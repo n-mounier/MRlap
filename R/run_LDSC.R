@@ -2,16 +2,16 @@
 
 
 
-#' Run LDSC
-#'
-#' Use GenomicSEM to perform cross-trait LDSC analysis and returns
-#' the heritability of the exposure (SE) and the cross-trait intercept (SE)
-#'
-#' @param exposure_data xx
-#' @param outcome_data xx
-#'
-#' @inheritParams MRlap
-# #' @export
+# #' Run LDSC
+# #'
+# #' Use GenomicSEM to perform cross-trait LDSC analysis and returns
+# #' the heritability of the exposure (SE) and the cross-trait intercept (SE)
+# #'
+# #' @param exposure_data xx
+# #' @param outcome_data xx
+# #'
+# #' @inheritParams MRlap
+# # #' @export
 # NOT EXPORTED
 
 run_LDSC <- function(exposure_data,
@@ -63,7 +63,7 @@ run_LDSC <- function(exposure_data,
   h2_exp = as.numeric(LDSCoutput$S[1,1])
   h2_exp_SE = sqrt(LDSCoutput$V[1,1])
 
-  gcov_int = LDSCoutput$I[1,2]
+  gcov_int = as.numeric(LDSCoutput$I[1,2])
   output = readLines(paste0(c(traits, "ldsc.log"), collapse="_"))
   gcov_int_SE = as.numeric(stringr::str_replace(stringr::str_split(output[stringr::str_detect(output, "Cross trait Intercept")], "\\(" )[[1]][2], "\\)", ""))
 
@@ -74,9 +74,9 @@ run_LDSC <- function(exposure_data,
   h2_out = as.numeric(LDSCoutput$S[2,2])
   h2_out_SE = sqrt(LDSCoutput$V[3,3])
 
-  rgcov = LDSCoutput$S[1,2]
+  rgcov = as.numeric(LDSCoutput$S[1,2])
   # what is reported by GenomicSEM is sigma_g : the covariance, need to be rescaled to get the correlation
-  rg = LDSCoutput$S[1,2]/sqrt(LDSCoutput$S[1,1]*LDSCoutput$S[2,2])
+  rg = as.numeric(LDSCoutput$S[1,2]/sqrt(LDSCoutput$S[1,1]*LDSCoutput$S[2,2]))
   # what is reported by GenomicSEM is se(sigma_g)^2 with sigma_g being the covariance, not the correlation!
   rgcov_SE= sqrt(LDSCoutput$V[2,2])
 

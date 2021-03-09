@@ -2,15 +2,15 @@
 
 
 
-#' Tidy input GWAS
-#'
-#' From the GWAS arguments (exposure/outcome) of the main MRlap function,
-#' create a nice/tidy data.frame that can be used by all other functions.
-#'
-#' @param GWAS xx
-#'
-#' @inheritParams MRlap
-##' @export
+# #' Tidy input GWAS
+# #'
+# #' From the GWAS arguments (exposure/outcome) of the main MRlap function,
+# #' create a nice/tidy data.frame that can be used by all other functions.
+# #'
+# #' @param GWAS xx
+# #'
+# #' @inheritParams MRlap
+# #' @export
 # NOT EXPORTED
 
 
@@ -42,9 +42,7 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
 
   } else if(is.data.frame(GWAS)){ # if data.frame
-    # add attribute GName to the data.frame, to be re-used in other subfunctions
-    attributes(GWAS)$GName =  deparse(substitute(GWAS)) # get the "name" of the object used as an argument in the function
-    # we want a data.frame (tidyr), not a data.table
+      # we want a data.frame (tidyr), not a data.table
     if(data.table::is.data.table(GWAS)) GWAS = as.data.frame(GWAS)
     if(verbose) cat(paste0("The data.frame used as input is: \"",
                            attributes(GWAS)$GName, "\".  \n"))
