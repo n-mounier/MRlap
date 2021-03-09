@@ -155,7 +155,9 @@ error,
 “test\_difference” : test statistic used to test for differences between
 observed and corrected effects,  
 “p\_difference” : p-value corresponding to the test statistic used to
-test for differences between observed and corrected effects. \<
+test for differences between observed and corrected effects.
+
+</ul>
 
   - LDSC
 
@@ -171,7 +173,9 @@ test for differences between observed and corrected effects. \<
 “gcov\_se” : genetic covariance estimate standard error,  
 “rg” : genetic correlation estimate, “int\_crosstrait” : cross-trait
 intercept estimate, “int\_crosstrait\_se”: cross-trait intercept
-estimate standard error. \<
+estimate standard error.
+
+</ul>
 
 ##### Aditionnaly, if `save_logfiles=TRUE`, LDSC log files are created in the current working directory :
 

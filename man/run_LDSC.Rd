@@ -19,7 +19,7 @@ run_LDSC(exposure_data, exposure_name, outcome_data, outcome_name, ld, hm3,
 \item{ld}{The path to the folder in which the LD scores used in the analysis are located.
 Expects LD scores formated as required by the original LD score regression software.  (character)}
 
-\item{hm3}{The path to the folder in which the LD scores used in the analysis are located.
+\item{hm3}{The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
 (character)}
 
 \item{save_logfiles}{A logical indicating if log files from LDSC should be saved,

@@ -42,6 +42,10 @@
 #' BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
 #' SE should be : \code{se}, \code{std} \cr
 #'
+#' Setting \code{sn} to a smaller value is strongly discouraged, it can lead to an innacurate
+#' estimates of the corrected effect SE, therefore affecting the results of the difference testing
+#' between observed and corrected effects.
+#'
 #' @importFrom rlang .data
 #' @export
 
@@ -58,7 +62,6 @@ MRlap <- function(exposure,
                   sn=10000,
                   save_logfiles = FALSE,
                   verbose = TRUE) {
-  print("use Z instead of z")
 
 
   # Path where the analysis has been launched

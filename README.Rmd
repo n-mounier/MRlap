@@ -130,7 +130,9 @@ These are needed by the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/
         "corrected_effect" : corrected causal effect estimate,    
         "corrected_effect_se" : corrected causal effect estimate standard error,   
         "test_difference" : test statistic used to test for differences between observed and corrected effects,    
-        "p_difference" : p-value corresponding to the test statistic used to test for differences between observed and corrected effects.  <\ul>
+        "p_difference" : p-value corresponding to the test statistic used to test for differences between observed and corrected effects.     </ul>     
+
+
         
 - LDSC
 
@@ -144,7 +146,7 @@ These are needed by the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/
         "gcov_se" : genetic covariance estimate standard error,    
         "rg" : genetic correlation estimate,
         "int_crosstrait" : cross-trait intercept estimate,
-        "int_crosstrait_se": cross-trait intercept estimate standard error.   <\ul>
+        "int_crosstrait_se": cross-trait intercept estimate standard error.     </ul>    
 
 
    
