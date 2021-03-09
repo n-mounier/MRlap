@@ -12,23 +12,24 @@ knitr::opts_chunk$set(echo = TRUE,
 options(pillar.neg=F, # do no print neg number in red
         pillar.subtle=F, # turn off highliting of significant digits
         tibble.width = 170) # default=95, increase it to make it readable
-# A = readRDS("inst/Data/A.RDS")
+A = readRDS("inst/Data/A.RDS")
+B = readRDS("inst/Data/B.RDS")
 # # automatically updates manual
-# devtools::build_manual()
-# system("mv ../bGWAS_1.0.2.pdf doc/MRlap-manual.pdf")
-# #
-# remove.packages("MRlap")
+devtools::build_manual()
+system("mv /Users/nmounier/Documents/SGG/Projects/MRlap_0.0.0.9000.pdf /Users/nmounier/Documents/SGG/Projects/MRlap/doc/MRlap-manual.pdf")
+remove.packages("MRlap")
 ```
 
 # MRlap  <img src="inst/Figures/logo.png" align="right" height=180/> 
 <!--- 
 # https://github.com/GuangchuangYu/hexSticker
 library(hexSticker)
-imgurl <- "inst/Figures/MRlap.png"
+imgurl <- "inst/Figures/MRlap2.png"
 sticker(imgurl, 
         package="", p_size=8, p_color="black",
         h_fill="black", h_color="black",
-        s_x=0.95, s_y=1.05, s_width=0.95,
+        s_x=0.95, s_y=0.90, s_width=0.95, # MRlap2
+        # s_x=0.95, s_y=1.05, s_width=0.95, # MRlap
         filename="inst/Figures/logo.png", dpi=2000) --->
         
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->    
@@ -38,7 +39,7 @@ sticker(imgurl,
 ## Overview
 [//]:*******
 
-`MRlap` is an R-package to perform two-sample Mendelian Randomisation (MR) analyses for (potentially) overlapping samples, using only GWAS summary statistics. MR estimates can be subject to different types of biases due to the overlap between the exposure and outcome samples, the use of weak instruments and Winner’s curse. Our approach  simultaneously accounts and corrects for all these biases. Estimating the corrected effect using our approach can be performed as a sensitivity analysis: if the corrected effect do not significantly differ from the observed effect, then IVW-MR estimate can be safely used. However, when there is a significant difference, corrected effects should be preferred as they should be less biased, independently of the sample overlap.       
+`MRlap` is an R-package to perform two-sample Mendelian Randomisation (MR) analyses for (potentially) overlapping samples, using only GWAS summary statistics. MR estimates can be subject to different types of biases due to the overlap between the exposure and outcome samples, the use of weak instruments and Winner’s curse. Our approach simultaneously accounts and corrects for all these biases. Estimating the corrected effect using our approach can be performed as a sensitivity analysis: if the corrected effect do not significantly differ from the observed effect, then IVW-MR estimate can be safely used. However, when there is a significant difference, corrected effects should be preferred as they should be less biased, independently of the sample overlap.       
 This package builds up on the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to perform cross-trait LD-score regression (LDSC) and the [`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for inverse-variance weighted (IVW-)MR analysis (and instruments pruning).
 
 
@@ -47,7 +48,7 @@ There is only one function available:
 -   **`MRlap()`**  
 main function that performs LDSC, IVW-MR analysis and provides a corrected causal effect estimate.
 
-<!--More details about their usage can be found in the [manual](doc/bGWAS-manual.pdf).-->
+More details about its usage can be found in the [manual](doc/MRlap-manual.pdf).
 
 
 ## Installation
@@ -98,23 +99,138 @@ These are needed by the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/
 
 - **Example A**
 
-```{r exampleA-part1}
-# Using simulated exposure/outcome data (1,150,000 SNPs - stored as data.frames)
-# MRlap()
+```{r exampleA, eval=F}
+# Using simulated exposure/outcome data 
+# ~100K samples for BMI/SBP, with 0% of sample overlap 
+# (only weak-instrument bias and Winner's curse)
+# (1,150,000 SNPs - stored in gzipped files)
+BMI <- system.file("data/", "BMI_Data.tsv.gz", package="MRlap")
+SBP <- system.file("data/", "SBP_Data.tsv.gz", package="MRlap")
 
+A = MRlap(exposure = SmallExposure_Data,
+          exposure_name = "simulated_exposure",
+          outcome = SmallOutcome_Data,
+          outcome_name = "simulated_outcome",
+          ld = "~/eur_w_ld_chr",
+          hm3 = "~/w_hm3.noMHC.snplist")
 # MR instruments will be selected using default parameter (5e-8) and distance-pruned (500Kb),
 # No file will be saved.
 ``` 
 
+<details>
+
+  <summary>Show log</summary>
+  
+    ```{r logAdisplay,echo=FALSE, eval=TRUE}
+    cat("<<< Preparation of analysis >>> \n",
+        "> Checking parameters \n",
+        "The p-value threshold used for selecting MR instruments is: 5e-08 \n",
+        "The distance used for pruning MR instruments is:  500 Kb  \n",
+        "> Processing exposure (BMI_100Ksample) summary statistics...  \n",
+        "# Preparation of the data...  \n",
+        "The data.frame used as input is: \"BMI_Data.tsv.gz\".   \n",
+        "   SNPID column, ok - CHR column, ok - POS column, ok - ALT column, ok - REF column, ok - Z column, ok - N column, ok  \n",
+        "> Processing outcome (SBP_100Ksample) summary statistics...  \n",
+        "# Preparation of the data...  \n",
+        "The data.frame used as input is: \"SBP_Data.tsv.gz\".   \n",
+        "   SNPID column, ok - CHR column, ok - POS column, ok - ALT column, ok - REF column, ok - Z column, ok - N column, ok  \n",
+        "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
+        "<<< Performing cross-trait LDSC >>>   \n",
+        "> Munging exposure data...  \n",
+        "> Munging outcome data...  \n",
+        "> Running cross-trait LDSC...  \n",
+        "  Please consider saving the log files and checking them to ensure that all columns were interpreted correctly and no warnings were issued for any of the summary statistics files \n",
+        "> Cleaning temporary files...  \n",
+        "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
+        "<<< Running IVW-MR >>>   \n",
+        "> Identifying IVs...  \n",
+        "    668 IVs with p < 5e-08  \n",
+        "    0 IVs excluded - more strongly associated with the outcome than with the exposure, p < 1e-03  \n",
+        "   Pruning : distance :  500 Kb  \n",
+        "    39 IVs left after pruning  \n",
+        "> Performing MR  \n",
+        "    IVW-MR observed effect: 0.0856 ( 0.0398 ) \n",
+        "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
+        "<<< Estimating corrected effect >>>   \n",
+        "> Estimating genetic architecture parameters...  \n",
+        "> Estimating corrected effect...  \n",
+        "    corrected effect: 0.115 ( 0.0535 ) \n",
+        "    covariance between observed and corrected effect: 0.00215   \n",
+        "> Testing difference between observed and corrected effect...  \n",
+        "Runtime of the analysis:  4  minute(s) and  36  second(s). \n")
+    ```
+
+    
+</details>   
+ 
+
 - **Example B**
 
-```{r exampleB}
-# Using simulated exposure/outcome data (less SNPs - stored as data.frames)
-# MRlap()
+```{r exampleB, eval=F}
+# Using simulated exposure/outcome data 
+# standard settings scenario, with 100% of sample overlap 
+# (~400,000 SNPs - stored as data.frames)
 
-# MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=),
+B = MRlap(exposure = SmallExposure_Data,
+          exposure_name = "simulated_exposure",
+          outcome = SmallOutcome_Data,
+          outcome_name = "simulated_outcome",
+          ld = "~/eur_w_ld_chr",
+          hm3 = "~/w_hm3.noMHC.snplist",
+          MR_threshold = 5e-10,
+          MR_pruning_LD = 0.05)
+# MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=0.05),
 # No file will be saved.
 ``` 
+
+
+<details>
+
+  <summary>Show log</summary>
+  
+    ```{r logBdisplay,echo=FALSE, eval=TRUE}
+    cat("<<< Preparation of analysis >>> \n",
+        "> Checking parameters \n",
+        "The p-value threshold used for selecting MR instruments is: 5e-10 \n",
+        "The distance used for pruning MR instruments is:  500 Kb  \n",
+        "The LD threshold used for pruning MR instruments is: 0.05 \n",
+        "> Processing exposure (simulated_exposure) summary statistics...  \n",
+        "# Preparation of the data...  \n",
+        "The data.frame used as input is: \"SmallExposure_Data\".   \n",
+        "   SNPID column, ok - CHR column, ok - POS column, ok - ALT column, ok - REF column, ok - Z column, ok - N column, ok  \n",
+        "> Processing outcome (simulated_outcome) summary statistics...  \n",
+        "# Preparation of the data...  \n",
+        "The data.frame used as input is: \"SmallOutcome_Data\".   \n",
+        "   SNPID column, ok - CHR column, ok - POS column, ok - ALT column, ok - REF column, ok - Z column, ok - N column, ok  \n",
+        "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
+        "<<< Performing cross-trait LDSC >>>   \n",
+        "> Munging exposure data...  \n",
+        "> Munging outcome data...  \n",
+        "> Running cross-trait LDSC...  \n",
+        "  Please consider saving the log files and checking them to ensure that all columns were interpreted correctly and no warnings were issued for any of the summary statistics files \n",
+        "> Cleaning temporary files...  \n",
+        "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
+        "<<< Running IVW-MR >>>   \n",
+        "> Identifying IVs...  \n",
+        "    106 IVs with p < 5e-10  \n",
+        "    0 IVs excluded - more strongly associated with the outcome than with the exposure, p < 1e-03  \n",
+        "   Pruning : distance :  500 Kb  - LD threshold :  0.05  \n",
+        "    32 IVs left after pruning  \n",
+        "> Performing MR  \n",
+        "    IVW-MR observed effect: 0.251 ( 0.0242 ) \n",
+        "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
+        "<<< Estimating corrected effect >>>   \n",
+        "> Estimating genetic architecture parameters...  \n",
+        "> Estimating corrected effect...  \n",
+        "    corrected effect: 0.236 ( 0.0277 ) \n",
+        "    covariance between observed and corrected effect: 0.00067  \n",
+        "> Testing difference between observed and corrected effect...  \n",
+        "Runtime of the analysis:  3  minute(s) and  41  second(s). \n")
+    ```
+
+    
+</details>   
+ 
 
 
 
@@ -148,19 +264,46 @@ These are needed by the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/
         "int_crosstrait" : cross-trait intercept estimate,
         "int_crosstrait_se": cross-trait intercept estimate standard error.     </ul>    
 
+- GeneticArchitecture
 
+<ul>    "polygenicity" : exposure polygenicity estimate,    
+        "perSNP_heritability" : exposure per-SNP heritability estimate.     </ul> 
    
 ##### Aditionnaly, if `save_logfiles=TRUE`, LDSC log files are created in the current working directory :
 -   **<exposure_name>.log** - exposure cleaning/munging log file   
 -   **<outcome_name>.log** - outcome cleaning/munging log file   
 -   **<exposure_name>.sumstats.gz_<outcome_name>.sumstats.gzldsc.log** - cross-trait LDSC log file
 
+
+- **Example A**
+```{r resultsA}
+# structure of the results
+str(A)
+# MR + correction
+unlist(A[["MRcorrection"]])
+```
+
+- **Example B**
+```{r resultsB}
+# observed effect
+B[["MRcorrection"]]$observed_effect
+# corrected effect
+B[["MRcorrection"]]$corrected_effect
+# difference p-value
+B[["MRcorrection"]]$p_difference
+
+# LDSC results
+unlist(B[["LDSC"]])
+```
+
 ## Runtime
 [//]:*******
 
-<!---Analysis using all the 38 prior GWASs available, for a conventional GWAS containing ~7M SNPs in common with the prior studies ~ 25 minutes.
+Example A ~ 4 minutes 30 seconds   
 
-Analysis using 6 prior GWASs, for a conventional GWAS containing ~ 300,000 SNPs in common with prior studies (see example A) ~ 2 minutes.--->
+Example B ~ 3 minutes 40 seconds   
+
+The runtime can be influenced by the size of the summary statistics files, the approach used for pruning (distance vs LD) but also by `s`, the number of simulations used for the sampling strategy to estimate the variance of the corrected causal effect and the covariance between observed and corrected effects. However, reducing the value of `s` is strongly discouraged as it can lead to an innacurate estimation of the corrected effect standard error.
 
 
 <font color="grey"><small> Results from analyses performed on a MacBook Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB 1867 MHz DDR3.</font> </small>    
