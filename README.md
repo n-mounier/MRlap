@@ -115,6 +115,9 @@ These are needed by the
 > created by the original LD score regression developers and available
 > here:
 > <https://data.broadinstitute.org/alkesgroup/LDSCORE/w_hm3.snplist.bz2>
+> (with MHC region)  
+> The one without the MHC region (used in the examples) can be found
+> here: <https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v>
 
 ### Analysis
 
