@@ -134,6 +134,9 @@ MRlap <- function(exposure,
   }
 
   # 0 : Tidy input GWAS
+  if(!is.null(exposure_name) & !is.character(exposure_name)) stop("exposure_name : non-character argument", call. = FALSE)
+  if(!is.null(outcome_name) & !is.character(outcome_name)) stop("outcome_name : non-character argument", call. = FALSE)
+
   if(verbose) cat(paste0("> Processing exposure ", ifelse(is.null(exposure_name), "", paste0("(",exposure_name,") ")) ,"summary statistics... \n"))
   if(is.null(exposure_name)) exposure_name="exposure"
   exposure_data = tidy_inputGWAS(exposure, verbose)

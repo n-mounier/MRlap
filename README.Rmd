@@ -39,8 +39,8 @@ sticker(imgurl,
 ## Overview
 [//]:*******
 
-`MRlap` is an R-package to perform two-sample Mendelian Randomisation (MR) analyses using (potentially) overlapping samples, relying only on GWAS summary statistics. MR estimates can be subject to different types of biases due to the overlap between the exposure and outcome samples, the use of weak instruments and Winner’s curse. Our approach simultaneously accounts and corrects for all these biases, using cross-trait LD-score regression (LDSC) to approximate the overlap. Estimating the corrected effect using our approach can be performed as a sensitivity analysis: if the corrected effect do not significantly differ from the observed effect, then IVW-MR estimate can be safely used. However, when there is a significant difference, corrected effects should be preferred as they should be less biased, independently of the sample overlap.       
-This package builds up on the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to perform cross-trait LDSC and the [`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for inverse-variance weighted (IVW-)MR analysis (and instruments pruning).
+`MRlap` is an R-package to perform two-sample Mendelian Randomisation (MR) analyses using (potentially) overlapping samples, relying only on GWAS summary statistics. MR estimates can be subject to different types of biases due to the overlap between the exposure and outcome samples, the use of weak instruments and winner’s curse. Our approach simultaneously accounts and corrects for all these biases, using cross-trait LD-score regression (LDSC) to approximate the overlap. Estimating the corrected effect using our approach can be performed as a sensitivity analysis: if the corrected effect do not significantly differ from the observed effect, then IVW-MR estimate can be safely used. However, when there is a significant difference, corrected effects should be preferred as they should be less biased, independently of the sample overlap.       
+This package builds up on the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to perform cross-trait LDSC and the [`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for inverse-variance weighted (IVW-)MR analysis (and instruments pruning). 
 
 
 There is only one function available:  
@@ -48,8 +48,8 @@ There is only one function available:
 -   **`MRlap()`**  
 main function that performs LDSC, IVW-MR analysis and provides a corrected causal effect estimate.
 
-More details about its usage can be found in the [manual](doc/MRlap-manual.pdf).
-
+More details about its usage can be found in the [manual](doc/MRlap-manual.pdf).      
+Note that both the exposure and the outcome should be continuous traits, because our correction can not account for a different degree of overlap for cases/controls in case of binary traits.    
 
 ## Installation
 [//]:*******
@@ -95,6 +95,8 @@ These are needed by the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/
 > The one without the MHC region (used in the examples) can be found here: https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v
 
 
+
+
 ### Analysis
 [//]:-------------------------------
 
@@ -104,10 +106,10 @@ Before running the examples, please make sure to have downloaded the input files
 
 ```{r exampleA, eval=F}
 # Using ~100K samples for BMI/SBP, with 0% of sample overlap
+# (only weak instrument bias and winner's curse)
 # Note that here the overlap is known (since we generated the data) but the MRlap
 # function works even the overlap is unkown (overlap is *not* a parameter of the function) 
 # as it uses cross-trait LDSC to approximate it
-# (only weak-instrument bias and Winner's curse)
 # (1,150,000 SNPs - stored in gzipped files)
 BMI <- system.file("data/", "BMI_Data.tsv.gz", package="MRlap")
 SBP <- system.file("data/", "SBP_Data.tsv.gz", package="MRlap")
@@ -292,7 +294,7 @@ str(A)
 unlist(A[["MRcorrection"]])
 # in this case, we observed that the corrected effects points towards an underestimation
 # of the observed effect estimate obtained using IVW (because when there is no sample 
-# overlap Winner's curse and weak-instrument bias will bias the estimate towards the null)
+# overlap winner's curse and weak instrument bias will bias the estimate towards the null)
 
 # LDSC results
 unlist(A[["LDSC"]])

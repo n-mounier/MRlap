@@ -24,7 +24,7 @@ sticker(imgurl,
 (MR) analyses using (potentially) overlapping samples, relying only on
 GWAS summary statistics. MR estimates can be subject to different types
 of biases due to the overlap between the exposure and outcome samples,
-the use of weak instruments and Winner’s curse. Our approach
+the use of weak instruments and winner’s curse. Our approach
 simultaneously accounts and corrects for all these biases, using
 cross-trait LD-score regression (LDSC) to approximate the overlap.
 Estimating the corrected effect using our approach can be performed as a
@@ -46,7 +46,10 @@ There is only one function available:
     corrected causal effect estimate.
 
 More details about its usage can be found in the
-[manual](doc/MRlap-manual.pdf).
+[manual](doc/MRlap-manual.pdf).  
+Note that both the exposure and the outcome should be continuous traits,
+because our correction can not account for a different degree of overlap
+for cases/controls in case of binary traits.
 
 ## Installation
 
@@ -131,10 +134,10 @@ parameters to indicate the correct paths.
 
 ``` r
 # Using ~100K samples for BMI/SBP, with 0% of sample overlap
+# (only weak instrument bias and winner's curse)
 # Note that here the overlap is known (since we generated the data) but the MRlap
 # function works even the overlap is unkown (overlap is *not* a parameter of the function) 
 # as it uses cross-trait LDSC to approximate it
-# (only weak-instrument bias and Winner's curse)
 # (1,150,000 SNPs - stored in gzipped files)
 BMI <- system.file("data/", "BMI_Data.tsv.gz", package="MRlap")
 SBP <- system.file("data/", "SBP_Data.tsv.gz", package="MRlap")
@@ -365,7 +368,7 @@ unlist(A[["MRcorrection"]])
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
 # of the observed effect estimate obtained using IVW (because when there is no sample 
-# overlap Winner's curse and weak-instrument bias will bias the estimate towards the null)
+# overlap winner's curse and weak instrument bias will bias the estimate towards the null)
 
 # LDSC results
 unlist(A[["LDSC"]])
