@@ -26,6 +26,16 @@ run_MR <- function(exposure_data,
 
   # here we need to join exposure and outcome data
   data <- dplyr::inner_join(exposure_data, outcome_data, by=c("rsid", "chr", "pos"), suffix=c(".exp", ".out"))
+  # and we need to make sure alleles are aligned!
+  data %>%
+    mutate(std_beta.out = case_when(
+      alt.exp == alt.out & ref.exp == ref.out ~ std_beta.out, # aligned
+      ref.exp == alt.out & alt.exp == ref.out ~ -std_beta.out, # swapped
+      TRUE ~ NA_real_ # otherwise exclude SNP
+    ) ) %>%
+    filter(!is.na(std_beta.out)) -> data
+
+
 
   if(verbose) cat("> Identifying IVs... \n")
   data %>%
