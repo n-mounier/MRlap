@@ -23,9 +23,9 @@
 # NOT EXPORTED
 
 get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
-                           alpha_obs, alpha_obs_se, n_exp, n_out, M, MR_threshold, verbose, s=10000){
+                           alpha_obs, alpha_obs_se, n_exp, n_out, MR_threshold, verbose, s=10000){
 
-
+  M=1150000 # consider M is a constant! number of independent markers genome-wide
   Tr = -stats::qnorm(MR_threshold/2)
   lambdaPrime = lambda/sqrt(n_exp*n_out)
 

@@ -114,7 +114,6 @@ run_MR <- function(exposure_data,
 
   return(list("alpha_obs" = res_MR_TwoSampleMR$b,
               "alpha_obs_se" = res_MR_TwoSampleMR$se,
-              "M" = nrow(data),
               "n_exp" = mean(data_pruned$N.exp),
               "n_out" = mean(data_pruned$N.out),
               "IVs" = data_pruned %>% dplyr::select(.data$std_beta.exp, .data$N.exp)))
