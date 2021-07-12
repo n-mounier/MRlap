@@ -29,7 +29,7 @@ Expects LD scores formated as required by the original LD score regression softw
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=5e-8} (numeric)}
 
-\item{MR_pruning_dist}{The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
+\item{MR_pruning_dist}{The distance used for pruning MR instruments (in Kb), should be between 10 and 50000,
 \code{default=500} (numeric)}
 
 \item{MR_pruning_LD}{The LD threshold (r2) used for pruning MR instruments, should be between 0 and 1
