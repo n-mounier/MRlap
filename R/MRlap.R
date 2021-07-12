@@ -17,7 +17,7 @@
 #'        (character)
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=5e-8} (numeric)
-#' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 1000,
+#' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 50000,
 #'        \code{default=500} (numeric)
 #' @param MR_pruning_LD The LD threshold (r2) used for pruning MR instruments, should be between 0 and 1
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
@@ -117,7 +117,7 @@ MRlap <- function(exposure,
   ## MR_pruning_dist
   if(!is.numeric(MR_pruning_dist)) stop("MR_pruning_dist : non-numeric argument", call. = FALSE)
   if(MR_pruning_dist<10) stop("MR_pruning_dist : should be higher than 10Kb", call. = FALSE)
-  if(MR_pruning_dist>1000) stop("MR_pruning_dist : should be lower than 1Mb", call. = FALSE)
+  if(MR_pruning_dist>50000) stop("MR_pruning_dist : should be lower than 50Mb", call. = FALSE)
 
 
   if(verbose) cat("The distance used for pruning MR instruments is: ", MR_pruning_dist, "Kb \n")
