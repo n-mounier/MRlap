@@ -144,6 +144,12 @@ MRlap <- function(exposure,
   if(is.null(outcome_name)) outcome_name="outcome"
   outcome_data = tidy_inputGWAS(outcome, verbose)
 
+  PreProcessTime = proc.time()
+  Time = as.integer((PreProcessTime-StartTime)[3])
+  minutes <- as.integer(trunc(Time/60))
+  seconds <- Time - minutes * 60
+  if(verbose) cat("Preprocessing: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
+
 
 
   ### 1 : run cross-trait LDSC ###
@@ -154,6 +160,13 @@ MRlap <- function(exposure,
   # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
   #     int_exp, int_out,  h2_out, h2_out_se, rgcov, rgcov_se, rg
 
+  LDSCTime = proc.time()
+  Time = as.integer((LDSCTime-PreProcessTime)[3])
+  minutes <- as.integer(trunc(Time/60))
+  seconds <- Time - minutes * 60
+  if(verbose) cat("LDSC: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
+
+
   # 2 : run IVW-MR
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Running IVW-MR >>>  \n")
@@ -161,6 +174,13 @@ MRlap <- function(exposure,
   MR_results = run_MR(exposure_data, outcome_data, MR_threshold,
                       MR_pruning_dist, MR_pruning_LD, MR_reverse,
                       verbose)
+
+  IVWTime = proc.time()
+  Time = as.integer((IVWTime-LDSCTime)[3])
+  minutes <- as.integer(trunc(Time/60))
+  seconds <- Time - minutes * 60
+  if(verbose) cat("IVW: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
+
   # -> alpha_obs, alpha_obs_se, n_exp, n_out, IVs
   # 3 : get corrected effect
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
@@ -171,6 +191,11 @@ MRlap <- function(exposure,
                                       n_exp, n_out, MR_threshold, verbose, s))
   # -> alpha_corrected, alpha_corrected_se, cov_obs_corrected, test_diff, p_diff
   #    pi_x, sigma2_x
+  MRlapTime = proc.time()
+  Time = as.integer((MRlapTime-IVWTime)[3])
+  minutes <- as.integer(trunc(Time/60))
+  seconds <- Time - minutes * 60
+  if(verbose) cat("MRlap: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
 
 
   tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"

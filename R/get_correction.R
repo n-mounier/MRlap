@@ -25,6 +25,8 @@
 get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
                            alpha_obs, alpha_obs_se, n_exp, n_out, MR_threshold, verbose, s=10000){
 
+  T0 = proc.time()
+
   M=1150000 # consider M is a constant! number of independent markers genome-wide
   Tr = -stats::qnorm(MR_threshold/2)
   lambdaPrime = lambda/sqrt(n_exp*n_out)
@@ -96,6 +98,12 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
 
   alpha_corrected = get_alpha(n_exp, lambdaPrime, res_genA[1], res_genA[2], alpha_obs, Tr)
 
+  T1 = proc.time()
+  Time = as.integer((T0-T1)[3])
+  minutes <- as.integer(trunc(Time/60))
+  seconds <- Time - minutes * 60
+  if(verbose) cat("MRlap (get corrected effect): ", minutes, " minute(s) and ", seconds, " second(s).  \n")
+
 
 
   ## get SE and covariance
@@ -144,6 +152,12 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
   test_diff = (alpha_obs - alpha_corrected) /
                      sqrt(alpha_obs_se^2 + se_cov[1]^2 - 2* se_cov[2])
   p_diff = 2*stats::pnorm(-abs(test_diff), lower.tail=T)
+
+  T2 = proc.time()
+  Time = as.integer((T2-T1)[3])
+  minutes <- as.integer(trunc(Time/60))
+  seconds <- Time - minutes * 60
+  if(verbose) cat("MRlap (get SE): ", minutes, " minute(s) and ", seconds, " second(s).  \n")
 
 
   return(list("alpha_corrected"=alpha_corrected,
