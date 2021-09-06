@@ -38,7 +38,7 @@ than 1e-5, \code{default=5e-8} (numeric)}
 \item{MR_reverse}{The p-value used to exclude MR instruments that are more strongly associated with the outcome
 than with the exposure,\code{default=1e-3} (numeric)}
 
-\item{s}{The number of simulations used for sampling strategy to estimate the variance of the corrected causal
+\item{s}{The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
 effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)}
 
 \item{save_logfiles}{A logical indicating if log files from LDSC should be saved,

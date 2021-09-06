@@ -23,7 +23,7 @@
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param MR_reverse The p-value used to exclude MR instruments that are more strongly associated with the outcome
 #'        than with the exposure,\code{default=1e-3} (numeric)
-#' @param s The number of simulations used for sampling strategy to estimate the variance of the corrected causal
+#' @param s The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
 #'        effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)
 #' @param save_logfiles  A logical indicating if log files from LDSC should be saved,
 #'        \code{default=FALSE}
@@ -175,6 +175,11 @@ MRlap <- function(exposure,
 
   tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
 
+  if(is.na(correction_results$alpha_corrected_se)){
+    if(verbose) cat("WARNING: the sampling strategy failed in the estimation of the standard error.\n")
+    if(verbose) cat("Please try to increase the number of simulations s. \n")
+
+  }
 
   ### we're done! ###
   Time = as.integer((proc.time()-StartTime)[3])
