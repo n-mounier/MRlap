@@ -48,7 +48,7 @@ run_MR <- function(exposure_data,
     reverse_t_threshold  =  stats::qnorm(MR_reverse)
     data_thresholded %>%
       dplyr::filter( ( abs(.data$std_beta.exp) - abs(.data$std_beta.out)) /
-                       sqrt(1/.data$N.exp + 1/.data$N.out) > reverse_t_threshold) -> data_thresholded_filtered
+                       sqrt(.data$std_SE.exp + .data$std_SE.out) > reverse_t_threshold) -> data_thresholded_filtered
     if(verbose) cat("   ", nrow(data_thresholded)-nrow(data_thresholded_filtered), "IVs excluded - more strongly associated with the outcome than with the exposure, p <", format(MR_reverse, scientific = T), "\n")
     data_thresholded = data_thresholded_filtered
     rm(data_thresholded_filtered)
@@ -108,7 +108,7 @@ run_MR <- function(exposure_data,
   if(verbose) cat("> Performing MR \n")
 
   TwoSampleMR::mr_ivw(data_pruned$std_beta.exp, data_pruned$std_beta.out,
-                      1/sqrt(data_pruned$N.exp), 1/sqrt(data_pruned$N.out)) -> res_MR_TwoSampleMR
+                      data_pruned$std_SE.exp, data_pruned$std_SE.out) -> res_MR_TwoSampleMR
 
   if(verbose) cat("   ",  "IVW-MR observed effect:", format(res_MR_TwoSampleMR$b, digits = 3), "(", format(res_MR_TwoSampleMR$se, digits=3), ")\n")
 
@@ -116,6 +116,6 @@ run_MR <- function(exposure_data,
               "alpha_obs_se" = res_MR_TwoSampleMR$se,
               "n_exp" = mean(data_pruned$N.exp),
               "n_out" = mean(data_pruned$N.out),
-              "IVs" = data_pruned %>% dplyr::select(.data$std_beta.exp, .data$N.exp)))
+              "IVs" = data_pruned %>% dplyr::select(.data$std_beta.exp, .data$std_SE.exp)))
 
 }

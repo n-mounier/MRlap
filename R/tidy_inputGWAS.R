@@ -15,7 +15,7 @@
 
 
 
-tidy_inputGWAS <- function(GWAS, verbose=FALSE){
+tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
 
   if(verbose) cat("# Preparation of the data... \n")
 
@@ -50,6 +50,8 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
   }
 
+
+  if(verbose & !is.na(K_t)) cat("   case-control data\n")
 
 
   HeaderGWAS = tolower(HeaderGWAS)
@@ -143,9 +145,14 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
   #if no Z, but BETA and SE, calculate Z
   if(getZ){
-    GWASData_clean %>%
-      dplyr::mutate(Z = .data$beta/.data$se,
-             beta=NULL, se=NULL) -> GWASData_clean
+    if(!is.na(K_t)){
+      dplyr::mutate(Z = log(.data$beta)/.data$se,
+                    beta=NULL, se=NULL) -> GWASData_clean
+    } else  {
+      GWASData_clean %>%
+        dplyr::mutate(Z = .data$beta/.data$se,
+                      beta=NULL, se=NULL) -> GWASData_clean
+    }
   } else {
     GWASData_clean %>%
       dplyr::mutate(beta=NULL, se=NULL) -> GWASData_clean
@@ -153,11 +160,27 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
   # Get standardised effects for MR
   # + LDSC needs a p-value column
+  if(!is.na(K_t)){
 
-  GWASData_clean %>%
-    dplyr::mutate(std_beta = .data$Z/sqrt(.data$N),
-           p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean
+    delta_t = ((K_t^2 * (1-K_t)^2) / (P_t * (1-P_t))) *
+      ( 1 / ( dnorm( qnorm(1-K_t)) )^2 )
 
+    i_t = dnorm( qnorm(1-K_t)) / K_t
+    t= qnorm(1-K_t)
+    theta_t = ( i_t * (P_t-K_t) / (1-K_t )) * (i_t * (P_t-K_t) / (1-K_t ) - t )
+
+    GWASData_clean %>%
+      dplyr::mutate(Ntot = .data$N,#/(4 * P_t * (1-P_t)),
+                    std_beta = sqrt(delta_t)*.data$Z/sqrt(.data$Ntot+delta_t*theta_t*.data$Z^2),
+                    std_SE = 1/.data$Z * std_beta,
+                    #Z = std_beta/std_SE,
+                    p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean3
+  } else {
+    GWASData_clean %>%
+      dplyr::mutate(std_beta = .data$Z/sqrt(.data$N),
+                    std_SE = 1/sqrt(.data$N),
+                    p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean
+  }
   res=GWASData_clean
   return(res)
 
