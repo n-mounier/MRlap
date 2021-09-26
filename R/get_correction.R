@@ -23,7 +23,7 @@
 # NOT EXPORTED
 
 get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
-                           alpha_obs, alpha_obs_se, n_exp, n_out, MR_threshold, verbose, s=1000){
+                           alpha_obs, alpha_obs_se, n_exp, n_out, MR_threshold, verbose, s=100, sthreshold, extracheck=F){
 
   M=1150000 # consider M is a constant! number of independent markers genome-wide
   Tr = -stats::qnorm(MR_threshold/2)
@@ -99,7 +99,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
 
 
   ## get SE and covariance
-  get_correctedSE <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s=1000){
+  get_correctedSE <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s=1000, sthreshold, extracheck){
 
     get_s <- function(s){
       effects = IVs$std_beta.exp
@@ -145,8 +145,15 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     subsets_cov = unlist(lapply(all_params_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 
     needmore = F
-    if(stats::sd(subsets_se) / base::mean(subsets_se) > 0.05) needmore=T
-    if(stats::sd(subsets_cov) / base::mean(subsets_cov) > 0.05) needmore=T
+    if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
+    if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
+    if(extracheck & (alpha_obs_se^2 + se_cov[1]^2 - 2* se_cov[2])<0) needmore=T
+
+    temp = data.frame(s=nrow(res),
+                      SE =  stats::sd(res$corrected),
+                      ratioSE = stats::sd(subsets_se) / base::mean(subsets_se),
+                      COV = stats::cov(res$corrected, res$alpha),
+                      ratioCOV = stats::sd(subsets_cov) / base::mean(subsets_cov))
 
     while(needmore){
       res = rbind(res,get_s(s))
@@ -157,17 +164,30 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
       subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 
       needmore = F
-      if(stats::sd(subsets_se) / base::mean(subsets_se) > 0.05) needmore=T
-      if(stats::sd(subsets_cov) / base::mean(subsets_cov) > 0.05) needmore=T
+      if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
+      if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
+      if(extracheck & (alpha_obs_se^2 + se_cov[1]^2 - 2* se_cov[2])<0) needmore=T
+
+
+      temp = rbind(temp,
+                   data.frame(s=nrow(res),
+                              SE =  stats::sd(res$corrected),
+                              ratioSE = stats::sd(subsets_se) / base::mean(subsets_se),
+                              COV = stats::cov(res$corrected, res$alpha),
+                              ratioCOV = stats::sd(subsets_cov) / base::mean(subsets_cov)))
     }
 
-    return(c(stats::sd(res$corrected), stats::cov(res$alpha, res$corrected)), nrow(res))
+    all_res = list(
+      "res" = c(stats::sd(res$corrected), stats::cov(res$alpha, res$corrected), nrow(res)),
+      "extensive_res" = temp)
+    # normally, remove all temp and return just "res"
+    return(all_res)
   }
 
-  # get SE corrected effects + COV for s
-  se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s)
-  # split : 10 "subsets"
-
+  # get SE corrected effects + COV
+  se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr,s)
+  tmp = se_cov$extensive_res
+  se_cov = se_cov$res
 
   if(verbose) cat("   ",  "corrected effect:", format(alpha_corrected, digits = 3), "(", format(se_cov[1], digits=3), ")\n")
   if(verbose) cat("   ",  "covariance between observed and corrected effect:", format(se_cov[2], digits=3), "\n")
@@ -184,5 +204,6 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
               "test_diff"=test_diff,
               "p_diff"=p_diff,
               "pi_x" = res_genA[1],
-              "sigma2_x" = res_genA[2]^2))
+              "sigma2_x" = res_genA[2]^2,
+              "temp" = temp))
 }
