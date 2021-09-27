@@ -73,7 +73,8 @@ MRlap <- function(exposure,
                   #s=10000,
                   save_logfiles = FALSE,
                   verbose = TRUE,
-                  sthreshold) {
+                  sthreshold,
+                  extracheck) {
 
 
   # Path where the analysis has been launched
@@ -178,7 +179,7 @@ MRlap <- function(exposure,
   correction_results = with(c(MR_results, LDSC_results),
     get_correction(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
                                       alpha_obs, alpha_obs_se,
-                                      n_exp, n_out, MR_threshold, verbose, sthreshold=sthreshold))
+                                      n_exp, n_out, MR_threshold, verbose, sthreshold=sthreshold, extracheck=extracheck))
   # -> alpha_corrected, alpha_corrected_se, cov_obs_corrected, test_diff, p_diff
   #    pi_x, sigma2_x
 
