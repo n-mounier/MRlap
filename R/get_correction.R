@@ -147,7 +147,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     needmore = F
     if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
     if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
-    if(extracheck & (alpha_obs_se^2 + se_cov[1]^2 - 2* se_cov[2])<0) needmore=T
+    if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected) - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
 
     temp = data.frame(s=nrow(res),
                       SE =  stats::sd(res$corrected),
