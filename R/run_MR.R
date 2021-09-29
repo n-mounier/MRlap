@@ -42,6 +42,8 @@ run_MR <- function(exposure_data,
     dplyr::filter(.data$p.exp<MR_threshold) -> data_thresholded
   if(verbose) cat("   ", format(nrow(data_thresholded), big.mark=","), "IVs with p <", format(MR_threshold, scientific = T), "\n")
 
+  # if no IVs, stop()
+  if(nrow(data_thresholded)==0) stop("no IV left after thresholding")
 
   # here remove the ones with
   if(!is.null(MR_reverse)){
@@ -53,6 +55,10 @@ run_MR <- function(exposure_data,
     data_thresholded = data_thresholded_filtered
     rm(data_thresholded_filtered)
   }
+
+  # if no IVs, stop()
+  if(nrow(data_thresholded)==0) stop("no IV left after excluding IVs more strongly associated with the outcome than with the exposure")
+
 
   data_thresholded %>%
     dplyr::transmute(SNP = .data$rsid,

@@ -147,7 +147,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     needmore = F
     if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
     if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
-    if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected) - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
+    if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
 
     temp = data.frame(s=nrow(res),
                       SE =  stats::sd(res$corrected),
@@ -166,7 +166,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
       needmore = F
       if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
       if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
-      if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected) - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
+      if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
 
 
       temp = rbind(temp,
@@ -186,7 +186,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
 
   # get SE corrected effects + COV
   se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr,s, sthreshold, extracheck)
-  tmp = se_cov$extensive_res
+  temp = se_cov$extensive_res
   se_cov = se_cov$res
 
   if(verbose) cat("   ",  "corrected effect:", format(alpha_corrected, digits = 3), "(", format(se_cov[1], digits=3), ")\n")
@@ -205,5 +205,5 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
               "p_diff"=p_diff,
               "pi_x" = res_genA[1],
               "sigma2_x" = res_genA[2]^2,
-              "temp" = tmp))
+              "temp" = temp))
 }

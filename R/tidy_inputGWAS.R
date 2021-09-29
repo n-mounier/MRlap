@@ -24,10 +24,10 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
                    POS = c("pos"),
                    ALT = c("a1", "alt", "alts"),
                    REF = c("ref", "a0", "a2"),
-                   BETA = c("beta", "b", "beta1"),
+                   BETA = c("beta", "b", "beta1", "or"),
                    SE = c("se", "std"),
                    Z = c("z", "zscore"),
-                   N = c("n"))
+                   N = c("n", "neff"))
 
 
   if(is.character(GWAS)) {
@@ -76,15 +76,30 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
 
 
   # if beta + se
-  if(!all(!HeaderGWAS %in% GWASnames[["BETA"]]) & !all(!HeaderGWAS %in% GWASnames[["SE"]])){
-    if(all(!HeaderGWAS %in% GWASnames[["Z"]])){
+  # if(!all(!HeaderGWAS %in% GWASnames[["BETA"]]) & !all(!HeaderGWAS %in% GWASnames[["SE"]])){
+  #   if(all(!HeaderGWAS %in% GWASnames[["Z"]])){
+  #     tmp = c(tmp, "BETA column, ok")
+  #     tmp = c(tmp, "SE column, ok")
+  #     getZ=TRUE
+  #   } else if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
+  #     tmp = c(tmp, "Z column, ok")
+  #     getZ=FALSE
+  #   }
+  # } else {
+  #   stop("no effect (BETA/SE or Z) column(s)", call. = FALSE)
+  # }
+  # change -> we de not necessarily need beta and se if we do have z!
+  if(all(!HeaderGWAS %in% GWASnames[["Z"]])){
+    if(!all(!HeaderGWAS %in% GWASnames[["BETA"]]) & !all(!HeaderGWAS %in% GWASnames[["SE"]])){
       tmp = c(tmp, "BETA column, ok")
       tmp = c(tmp, "SE column, ok")
       getZ=TRUE
-    } else if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
-      tmp = c(tmp, "Z column, ok")
-      getZ=FALSE
+    } else {
+      stop("no effect (BETA/SE or Z) column(s)", call. = FALSE)
     }
+  } else if(!all(!HeaderGWAS %in% GWASnames[["Z"]])){
+    tmp = c(tmp, "Z column, ok")
+    getZ=FALSE
   } else {
     stop("no effect (BETA/SE or Z) column(s)", call. = FALSE)
   }
@@ -145,7 +160,8 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
 
   #if no Z, but BETA and SE, calculate Z
   if(getZ){
-    if(!is.na(K_t)){
+    # if OR, use log(OR)/SE
+    if("or" %in% HeaderGWAS){
       dplyr::mutate(Z = log(.data$beta)/.data$se,
                     beta=NULL, se=NULL) -> GWASData_clean
     } else  {
@@ -169,12 +185,13 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
     t= qnorm(1-K_t)
     theta_t = ( i_t * (P_t-K_t) / (1-K_t )) * (i_t * (P_t-K_t) / (1-K_t ) - t )
 
+
     GWASData_clean %>%
-      dplyr::mutate(Ntot = .data$N,#/(4 * P_t * (1-P_t)),
+      dplyr::mutate(Ntot = .data$N/(4 * P_t * (1-P_t)),
                     std_beta = sqrt(delta_t)*.data$Z/sqrt(.data$Ntot+delta_t*theta_t*.data$Z^2),
                     std_SE = 1/.data$Z * std_beta,
                     #Z = std_beta/std_SE,
-                    p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean3
+                    p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean
   } else {
     GWASData_clean %>%
       dplyr::mutate(std_beta = .data$Z/sqrt(.data$N),
