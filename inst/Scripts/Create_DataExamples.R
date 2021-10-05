@@ -23,7 +23,7 @@ save(SmallOutcome_Data, file="~/Documents/SGG/Projects/MRlap/data/SmallOutcome_D
 
 
 ## Rdata for tests
-# last update, 2021/03/09
+# last update, 2021/10/05
 library(MRlap)
 
 # we use ~100K samples for BMI/SBP, with 0% of sample overlap
@@ -47,9 +47,9 @@ saveRDS(A, file="~/Documents/SGG/Projects/MRlap/inst/Data/A.RDS")
 data("SmallExposure_Data")
 data("SmallOutcome_Data")
 
-B = MRlap(exposure = Exposure_Data,
+B = MRlap(exposure = SmallExposure_Data,
           exposure_name = "simulated_exposure",
-          outcome = Outcome_Data,
+          outcome = SmallOutcome_Data,
           outcome_name = "simulated_outcome",
           ld = "~/eur_w_ld_chr",
           hm3 = "~/w_hm3.noMHC.snplist",

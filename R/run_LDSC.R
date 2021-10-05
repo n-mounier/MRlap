@@ -16,8 +16,12 @@
 
 run_LDSC <- function(exposure_data,
                      exposure_name,
+                     K_exposure,
+                     P_exposure,
                      outcome_data,
                      outcome_name,
+                     K_outcome,
+                     P_outcome,
                      ld, hm3, save_logfiles, verbose){
 
   # write down exposure/outcome data
@@ -41,8 +45,8 @@ run_LDSC <- function(exposure_data,
 
   traits <- c(paste0(exposure_name, ".sumstats.gz"),
               paste0(outcome_name, ".sumstats.gz"))
-  sample.prev <- c(NA,NA) # continuous traits
-  population.prev <- c(NA,NA) # continuous traits
+  sample.prev <- c(P_exposure,P_outcome) # continuous traits
+  population.prev <- c(K_exposure,K_outcome) # continuous traits
 
   trait.names<-c(exposure_name, outcome_name)
 

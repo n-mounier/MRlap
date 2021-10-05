@@ -23,7 +23,7 @@
 # NOT EXPORTED
 
 get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
-                           alpha_obs, alpha_obs_se, n_exp, n_out, MR_threshold, verbose, s=10000){
+                           alpha_obs, alpha_obs_se, n_exp, n_out, MR_threshold, verbose){
 
   M=1150000 # consider M is a constant! number of independent markers genome-wide
   Tr = -stats::qnorm(MR_threshold/2)
@@ -59,7 +59,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     for(i in 1:nSP){
       theta = 3 * 10^(stats::runif(1, -7, -1))
       res_optim = stats::optimise(get_pi, interval=c(1e-7, 0.3),
-                           sumbeta2=sumBeta2, Tr=Tr, n_exp=n_exp, h2_LDSC=h2_LDSC, M=M, tol = 1e-6)
+                                  sumbeta2=sumBeta2, Tr=Tr, n_exp=n_exp, h2_LDSC=h2_LDSC, M=M, tol = 1e-6)
 
       Res_SP[i, 2:4] = c(theta, res_optim$objective, res_optim$minimum)
     }
@@ -99,53 +99,87 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
 
 
   ## get SE and covariance
-  get_correctedSE <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s=10000){
+  get_correctedSE <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s=1000, sthreshold=0.05, extracheck=T){
+
+    get_s <- function(s){
+      effects = IVs$std_beta.exp
+      effects_se = IVs$std_SE.exp
+
+      # simulate 500 lambda
+      L = matrix(stats::rnorm(s, lambda, lambda_se), ncol=s)/sqrt(n_exp*n_out)
+
+      # simulate 500 "instruments sets" - each column = 1 simulation
+      E =  matrix(stats::rnorm(nrow(IVs)*s, effects, effects_se), ncol= s)
+
+      # simulate 500 h2_LDSC
+      H = matrix(stats::rnorm(s, h2_LDSC, h2_LDSC_se), ncol=s)
+
+      # effects + h2 are needed to get pi and therefore sigma
+      D = rbind(E, H)
+
+      pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr))
+
+      # simulate 500 alpha_obs
+      B =  matrix(stats::rnorm(s, alpha_obs, alpha_obs_se), ncol= s)
 
 
-    effects = IVs$std_beta.exp
-    effects_se = 1/sqrt(IVs$N.exp)
 
-    # simulate 500 lambda
-    L = matrix(stats::rnorm(s, lambda, lambda_se), ncol=s)/sqrt(n_exp*n_out)
-
-    # simulate 500 "instruments sets" - each column = 1 simulation
-    E =  matrix(stats::rnorm(nrow(IVs)*s, effects, effects_se), ncol= s)
-
-    # simulate 500 h2_LDSC
-    H = matrix(stats::rnorm(s, h2_LDSC, h2_LDSC_se), ncol=s)
-
-    # effects + h2 are needed to get pi and therefore sigma
-    D = rbind(E, H)
-
-    pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr))
-
-    # simulate 500 alpha_obs
-    B =  matrix(stats::rnorm(s, alpha_obs, alpha_obs_se), ncol= s)
+      # get 500 alpha_corrected + sd
+      all_params = data.frame(pi = pis[1,],
+                              sigma = pis[2,],
+                              alpha = B[1,],
+                              lambda = L[1,])
 
 
+      all_params$corrected = apply(all_params, 1, function(x) get_alpha(n_exp, x[4],  x[1], x[2], x[3], Tr))
+      return(all_params)
+    }
 
-    # get 500 alpha_corrected + sd
-    all_params = data.frame(pi = pis[1,],
-                            sigma = pis[2,],
-                            alpha = B[1,],
-                            lambda = L[1,])
+    res = get_s(s)
 
-    all_params$corrected = apply(all_params, 1, function(x) get_alpha(n_exp, x[4],  x[1], x[2], x[3], Tr))
-    return(c(stats::sd(all_params$corrected), stats::cov(all_params$alpha, all_params$corrected)))
+    num_groups=10
+    res %>%
+      dplyr::group_by((row_number()-1) %/% (n()/num_groups)) %>%
+      tidyr::nest() %>% pull(data) -> res_subsets
+    subsets_se = unlist(lapply(res_subsets, function(x) stats::sd(x$corrected)))
+    subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
+
+    needmore = F
+    if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
+    if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
+    if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
+
+    while(needmore){
+      res = rbind(res,get_s(s))
+      res %>%
+        dplyr::group_by((row_number()-1) %/% (n()/num_groups)) %>%
+        tidyr::nest() %>% pull(data) -> res_subsets
+      subsets_se = unlist(lapply(res_subsets, function(x) stats::sd(x$corrected)))
+      subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
+
+      needmore = F
+      if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
+      if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
+      if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
+    }
+
+    all_res = c(stats::sd(res$corrected), stats::cov(res$alpha, res$corrected), nrow(res))
+    # normally, remove all temp and return just "res"
+    return(all_res)
   }
 
-  se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s)
+  # get SE corrected effects + COV
+  se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr)
 
   if(verbose) cat("   ",  "corrected effect:", format(alpha_corrected, digits = 3), "(", format(se_cov[1], digits=3), ")\n")
   if(verbose) cat("   ",  "covariance between observed and corrected effect:", format(se_cov[2], digits=3), "\n")
+  if(verbose) cat("           ",  se_cov[3], "simulations were used to estimate the variance and the covariance.\n")
 
   if(verbose) cat("> Testing difference between observed and corrected effect... \n")
 
   test_diff = (alpha_obs - alpha_corrected) /
-                     sqrt(alpha_obs_se^2 + se_cov[1]^2 - 2* se_cov[2])
+    sqrt(alpha_obs_se^2 + se_cov[1]^2 - 2* se_cov[2])
   p_diff = 2*stats::pnorm(-abs(test_diff), lower.tail=T)
-
-
   return(list("alpha_corrected"=alpha_corrected,
               "alpha_corrected_se" = se_cov[1],
               "cov_obs_corrected" = se_cov[2],

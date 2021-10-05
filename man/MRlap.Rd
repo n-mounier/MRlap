@@ -4,9 +4,10 @@
 \alias{MRlap}
 \title{MRlap - main function}
 \usage{
-MRlap(exposure, exposure_name = NULL, outcome, outcome_name = NULL, ld,
-  hm3, MR_threshold = 5e-08, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_reverse = 0.001, s = 10000,
+MRlap(exposure, exposure_name = NULL, K_exposure = NA,
+  P_exposure = NA, outcome, outcome_name = NULL, K_outcome = NA,
+  P_outcome = NA, ld, hm3, MR_threshold = 5e-08,
+  MR_pruning_dist = 500, MR_pruning_LD = 0, MR_reverse = 0.001,
   save_logfiles = FALSE, verbose = TRUE)
 }
 \arguments{
@@ -15,10 +16,18 @@ or a \code{data.frame} (character, or \code{data.frame})}
 
 \item{exposure_name}{The name of the exposure trait, \code{default="exposure"} (character)}
 
+\item{K_exposure}{If case-control exposure, prevalence in the population, \code{default=NA for continuous traits} (numeric)}
+
+\item{P_exposure}{If case-control exposure, prevalence in the sample, \code{default=NA for continuous traits} (numeric)}
+
 \item{outcome}{The path to the file containing the GWAS summary statistics for the exposure,
 or a \code{data.frame} (character, or \code{data.frame})}
 
 \item{outcome_name}{The name of the outcome trait, \code{default="outcome"} (character)}
+
+\item{K_outcome}{If case-control outcome, prevalence in the population, \code{default=NA for continuous traits} (numeric)}
+
+\item{P_outcome}{If case-control outcome, prevalence in the sample, \code{default=NA for continuous traits} (numeric)}
 
 \item{ld}{The path to the folder in which the LD scores used in the analysis are located.
 Expects LD scores formated as required by the original LD score regression software.  (character)}
@@ -37,9 +46,6 @@ than 1e-5, \code{default=5e-8} (numeric)}
 
 \item{MR_reverse}{The p-value used to exclude MR instruments that are more strongly associated with the outcome
 than with the exposure,\code{default=1e-3} (numeric)}
-
-\item{s}{The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
-effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)}
 
 \item{save_logfiles}{A logical indicating if log files from LDSC should be saved,
 \code{default=FALSE}}
@@ -64,10 +70,11 @@ REF (reference allele) should be : \code{a2}, \code{a0}, \code{ref} \cr
 Z (z-score) should be : \code{Z}, \code{zscore} \cr
 N (sample size) should be :  \code{N} \cr
 If Z is not present, it can be calculated from BETA and SE. \cr
-BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
+BETA should be : \code{b}, \code{beta}, \code{beta1}, \code{or} \cr
 SE should be : \code{se}, \code{std} \cr
-
-Setting \code{s} to a smaller value is strongly discouraged, it can lead to an innacurate
-estimatation of the corrected effect SE, therefore affecting the results of the difference testing
-between observed and corrected effects.
+If (at least) one of the datasets is coming from a case-control GWAS:*
+The Sample size column should correspond to the effective sample size (not the total sample size).
+The number of cases (NCASES) and the number of controls (NCONTROLS) can also be provided (instead or in addition to the effective sample size).
+NCASES should be : \code{n_cases}, \code{ncases}, \code{n_case}, \code{ncase} \cr
+NCONTROLS should be : \code{n_controls}, \code{ncontrols}, \code{n_control}, \code{ncontrol} \cr
 }

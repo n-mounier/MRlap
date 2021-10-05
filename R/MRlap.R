@@ -8,9 +8,13 @@
 #' @param exposure The path to the file containing the GWAS summary statistics for the exposure,
 #'        or a \code{data.frame} (character, or \code{data.frame})
 #' @param exposure_name The name of the exposure trait, \code{default="exposure"} (character)
+#' @param K_exposure If case-control exposure, prevalence in the population, \code{default=NA for continuous traits} (numeric)
+#' @param P_exposure If case-control exposure, prevalence in the sample, \code{default=NA for continuous traits} (numeric)
 #' @param outcome  The path to the file containing the GWAS summary statistics for the exposure,
 #'        or a \code{data.frame} (character, or \code{data.frame})
 #' @param outcome_name The name of the outcome trait, \code{default="outcome"} (character)
+#' @param K_outcome If case-control outcome, prevalence in the population, \code{default=NA for continuous traits} (numeric)
+#' @param P_outcome If case-control outcome, prevalence in the sample, \code{default=NA for continuous traits} (numeric)
 #' @param ld The path to the folder in which the LD scores used in the analysis are located.
 #'        Expects LD scores formated as required by the original LD score regression software.  (character)
 #' @param hm3 The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
@@ -23,8 +27,8 @@
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param MR_reverse The p-value used to exclude MR instruments that are more strongly associated with the outcome
 #'        than with the exposure,\code{default=1e-3} (numeric)
-#' @param s The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
-#'        effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)
+# #' @param s The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
+# #'        effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)
 #' @param save_logfiles  A logical indicating if log files from LDSC should be saved,
 #'        \code{default=FALSE}
 #' @param verbose  A logical indicating if information on progress should be reported,
@@ -42,27 +46,32 @@
 #' Z (z-score) should be : \code{Z}, \code{zscore} \cr
 #' N (sample size) should be :  \code{N} \cr
 #' If Z is not present, it can be calculated from BETA and SE. \cr
-#' BETA should be : \code{b}, \code{beta}, \code{beta1} \cr
+#' BETA should be : \code{b}, \code{beta}, \code{beta1}, \code{or} \cr
 #' SE should be : \code{se}, \code{std} \cr
-#'
-#' Setting \code{s} to a smaller value is strongly discouraged, it can lead to an innacurate
-#' estimatation of the corrected effect SE, therefore affecting the results of the difference testing
-#' between observed and corrected effects.
+#' If (at least) one of the datasets is coming from a case-control GWAS:*
+#' The Sample size column should correspond to the effective sample size (not the total sample size).
+#' The number of cases (NCASES) and the number of controls (NCONTROLS) can also be provided (instead or in addition to the effective sample size).
+#' NCASES should be : \code{n_cases}, \code{ncases}, \code{n_case}, \code{ncase} \cr
+#' NCONTROLS should be : \code{n_controls}, \code{ncontrols}, \code{n_control}, \code{ncontrol} \cr
 #'
 #' @importFrom rlang .data
 #' @export
 
 MRlap <- function(exposure,
                   exposure_name = NULL,
+                  K_exposure = NA,
+                  P_exposure = NA,
                   outcome,
                   outcome_name = NULL,
+                  K_outcome = NA,
+                  P_outcome = NA,
                   ld,
                   hm3,
                   MR_threshold = 5e-8,
                   MR_pruning_dist = 500,
                   MR_pruning_LD = 0,
                   MR_reverse = 1e-3,
-                  s=10000,
+                  #s=10000,
                   save_logfiles = FALSE,
                   verbose = TRUE) {
 
@@ -107,6 +116,34 @@ MRlap <- function(exposure,
     hm3 = normalizePath(hm3)
   } else stop("hm3 : wrong format, should be character", call. = FALSE)
 
+  ## case-control exposure
+  if(!is.na(K_exposure) & !is.numeric(K_exposure)) stop("K_exposure : non-numeric argument")
+  if(!is.na(K_exposure) & K_exposure>1) stop("K_exposure : should be smaller than 1")
+  if(!is.na(K_exposure) & K_exposure<1) stop("K_exposure : should be larger than 0")
+
+  if(!is.na(P_exposure) & !is.numeric(P_exposure)) stop("P_exposure : non-numeric argument")
+  if(!is.na(P_exposure) & P_exposure>1) stop("P_exposure : should be smaller than 1")
+  if(!is.na(P_exposure) & P_exposure<1) stop("P_exposure : should be larger than 0")
+
+  if(!is.na(P_exposure) & is.na(K_exposure)) stop("Both K_exposure and P_exposure should be provided")
+  if(!is.na(K_exposure) & is.na(P_exposure)) stop("Both K_exposure and P_exposure should be provided")
+
+  if(!is.na(K_exposure) & !is.na(P_exposure) & verbose) cat("The exposure is a binary trait ( population prevalence:", K_exposure, "- sample prevalence:", P_exposure ,")\n")
+
+  ## case-control outcome
+  if(!is.na(K_outcome) & !is.numeric(K_outcome)) stop("K_outcome : non-numeric argument")
+  if(!is.na(K_outcome) & K_outcome>1) stop("K_outcome : should be smaller than 1")
+  if(!is.na(K_outcome) & K_outcome<1) stop("K_outcome : should be larger than 0")
+
+  if(!is.na(P_outcome) & !is.numeric(P_outcome)) stop("P_outcome : non-numeric argument")
+  if(!is.na(P_outcome) & P_outcome>1) stop("P_outcome : should be smaller than 1")
+  if(!is.na(P_outcome) & P_outcome<1) stop("P_outcome : should be larger than 0")
+
+  if(!is.na(P_outcome) & is.na(K_outcome)) stop("Both K_outcome and P_outcome should be provided")
+  if(!is.na(K_outcome) & is.na(P_outcome)) stop("Both K_outcome and P_outcome should be provided")
+
+  if(!is.na(K_outcome) & !is.na(P_outcome) & verbose) cat("The outcome is a binary trait ( population prevalence:", K_outcome, "- sample prevalence:", P_outcome ,")\n")
+
 
   ## MR_threshold -> should not be larger than 10-5, can only be more stringent
   if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
@@ -139,10 +176,10 @@ MRlap <- function(exposure,
 
   if(verbose) cat(paste0("> Processing exposure ", ifelse(is.null(exposure_name), "", paste0("(",exposure_name,") ")) ,"summary statistics... \n"))
   if(is.null(exposure_name)) exposure_name="exposure"
-  exposure_data = tidy_inputGWAS(exposure, verbose)
+  exposure_data = tidy_inputGWAS(exposure, K_exposure, P_exposure, verbose)
   if(verbose) cat(paste0("> Processing outcome ", ifelse(is.null(outcome_name), "", paste0("(",outcome_name,") ")) ,"summary statistics... \n"))
   if(is.null(outcome_name)) outcome_name="outcome"
-  outcome_data = tidy_inputGWAS(outcome, verbose)
+  outcome_data = tidy_inputGWAS(outcome, K_outcome, P_outcome, verbose)
 
 
 
@@ -150,7 +187,8 @@ MRlap <- function(exposure,
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Performing cross-trait LDSC >>>  \n")
   # returns h2 exposure - SE h2 exposure - cross-trait intercept - SE cross-trait intercept
-  LDSC_results = run_LDSC(exposure_data, exposure_name, outcome_data, outcome_name, ld, hm3, save_logfiles, verbose)
+  LDSC_results = run_LDSC(exposure_data, exposure_name, K_exposure, P_exposure,
+                          outcome_data, outcome_name, K_outcome, P_outcome, ld, hm3, save_logfiles, verbose)
   # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
   #     int_exp, int_out,  h2_out, h2_out_se, rgcov, rgcov_se, rg
 
@@ -168,7 +206,7 @@ MRlap <- function(exposure,
   correction_results = with(c(MR_results, LDSC_results),
     get_correction(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
                                       alpha_obs, alpha_obs_se,
-                                      n_exp, n_out, MR_threshold, verbose, s))
+                                      n_exp, n_out, MR_threshold, verbose))
   # -> alpha_corrected, alpha_corrected_se, cov_obs_corrected, test_diff, p_diff
   #    pi_x, sigma2_x
 
@@ -195,10 +233,13 @@ MRlap <- function(exposure,
   results_MR=with(c(MR_results, correction_results),
                list("observed_effect" = alpha_obs,
                     "observed_effect_se" = alpha_obs_se,
+                    "observed_effect_p" = 2*stats::pnorm(-abs(alpha_obs/alpha_obs_se)),
                     "corrected_effect" = alpha_corrected,
                     "corrected_effect_se" = alpha_corrected_se,
+                    "corrected_effect_p" = 2*stats::pnorm(-abs(alpha_corrected/alpha_corrected_se)),
                     "test_difference" = test_diff,
                     "p_difference" = p_diff))
+                    # number of simulations needed to estimate SE/COV s
 
   results_LDSC=with(LDSC_results,
                   list("h2_exp" = h2_LDSC ,
