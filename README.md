@@ -94,9 +94,9 @@ Standard error: `se`, `std`
 
 *If (at least) one of the datasets is coming from a case-control
 GWAS:*  
-… the Sample size column should correspond to the total sample size. The
-number of cases and the number of controls can also be provided (instead
-of the total sample size):  
+… the Sample size column should correspond to the total sample size (not
+the effective sample size!!). The number of cases and the number of
+controls can also be provided (instead of the total sample size):  
 Number of cases: `n_cases` `ncases`, `n_case`, `ncase`  
 Number of controls: `n_controls` `ncontrols`, `n_control`, `ncontrol`
 
