@@ -49,8 +49,8 @@
 #' BETA should be : \code{b}, \code{beta}, \code{beta1}, \code{or} \cr
 #' SE should be : \code{se}, \code{std} \cr
 #' If (at least) one of the datasets is coming from a case-control GWAS:*
-#' The Sample size column should correspond to the effective sample size (not the total sample size).
-#' The number of cases (NCASES) and the number of controls (NCONTROLS) can also be provided (instead or in addition to the effective sample size).
+#' The Sample size column should correspond to the total sample size.
+#' The number of cases (NCASES) and the number of controls (NCONTROLS) can also be provided (instead of the total sample size).
 #' NCASES should be : \code{n_cases}, \code{ncases}, \code{n_case}, \code{ncase} \cr
 #' NCONTROLS should be : \code{n_controls}, \code{ncontrols}, \code{n_control}, \code{ncontrol} \cr
 #'

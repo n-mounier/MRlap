@@ -53,7 +53,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
   }
 
 
-  if(verbose & !is.na(K_t)) cat("   case-control data, analysis will be perform on the liability scale\n")
+  if(verbose & !is.na(K_t)) cat("   case-control data, analysis will be performed on the liability scale\n")
 
 
   HeaderGWAS = tolower(HeaderGWAS)
@@ -104,18 +104,17 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
     tmp = c(tmp, paste0("N column, ok \n"))
     if(sum(HeaderGWAS %in% GWASnames[["N"]])>1) stop("multiple N columns, please provide only one", call. = FALSE)
   } else {
-  #               if case-control with prevalence, should be N or Neff and/or (Ncases + Ncontrols)
-    getNeff = TRUE
+  #               if case-control with prevalence, should be N or Neff (for Ntot) or (Ncases + Ncontrols)
     getNtot = TRUE
-    if(all(HeaderGWAS %in% GWASnames[["N"]])){
-      tmp = c(tmp, paste0("N column, ok \n"))
-      getNeff=FALSE
-    }
-    if(!all(!HeaderGWAS %in% GWASnames[["Ncases"]]) & !all(!HeaderGWAS %in% GWASnames[["Ncontrols"]])){
+    if(!all(!HeaderGWAS %in% GWASnames[["N"]])){
+      tmp = c(tmp, paste0("N (total sample size) column, ok \n"))
+      getNtot = FALSE
+    } else if(!all(!HeaderGWAS %in% GWASnames[["Ncases"]]) & !all(!HeaderGWAS %in% GWASnames[["Ncontrols"]])){
       tmp = c(tmp, paste0("N (cases and controls) columns, ok \n"))
-      getNtot=FALSE
+      getNtot=TRUE
+    } else {
+      stop("no N column", call. = FALSE)
     }
-  if(getNeff & getNtot) stop("no N column", call. = FALSE)
   }
     # if(sum(HeaderGWAS %in% GWASnames[["N"]]) + sum(HeaderGWAS %in% GWASnames[["Ncases"]])>1) stop("multiple N columns (effective sample size + case / control sample sizes), please provide only one", call. = FALSE)
     # if(sum(HeaderGWAS %in% GWASnames[["N"]]) + sum(HeaderGWAS %in% GWASnames[["Ncontrols"]])>1) stop("multiple N columns (effective sample size + case / control sample sizes), please provide only one", call. = FALSE)
@@ -172,21 +171,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
       stats::setNames(colNames) -> GWASData_clean
 
   } else {
-    if(!getNeff & getNtot){
-      N = match(HeaderGWAS, GWASnames[["N"]])
-      N = which(!is.na(N))[1]
-
-      colNumbers = c(SNPID, CHR, POS, ALT, REF, BETA, SE, ZSTAT, N)
-      colNames = c("rsid", "chr", "pos", "alt", "ref", "beta", "se", "Z", "N")
-      colNames = colNames[!is.na(colNumbers)]
-      colNumbers = colNumbers[!is.na(colNumbers)]
-
-
-      GWASData %>%
-        dplyr::select(dplyr::all_of(colNumbers)) %>%
-        stats::setNames(colNames) %>%
-        dplyr::mutate(Ntot = .data$N/(4 * P_t * (1-P_t))) -> GWASData_clean
-    } else if(getNeff & !getNtot){
+    if(getNtot){
       N_cases = match(HeaderGWAS, GWASnames[["Ncases"]])
       N_cases = which(!is.na(N_cases))[1]
       N_controls = match(HeaderGWAS, GWASnames[["Ncontrols"]])
@@ -201,29 +186,22 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
       GWASData %>%
         dplyr::select(dplyr::all_of(colNumbers)) %>%
         stats::setNames(colNames) %>%
-        dplyr::mutate(Ntot = .data$Ncases+.data$Ncontrols,
-                      N = 4*.data$Ncases*.data$Ncontrols/.data$Ntot) -> GWASData_clean
-    } else if(!getNeff & !getNtot){
+        dplyr::mutate(N = .data$Ncases+.data$Ncontrols) -> GWASData_clean
+    } else {
       N = match(HeaderGWAS, GWASnames[["N"]])
       N = which(!is.na(N))[1]
-      N_cases = match(HeaderGWAS, GWASnames[["Ncases"]])
-      N_cases = which(!is.na(N_cases))[1]
-      N_controls = match(HeaderGWAS, GWASnames[["Ncontrols"]])
-      N_controls = which(!is.na(N_controls))[1]
 
-      colNumbers = c(SNPID, CHR, POS, ALT, REF, BETA, SE, ZSTAT, N, N_cases, N_controls)
-      colNames = c("rsid", "chr", "pos", "alt", "ref", "beta", "se", "Z", "N", "Ncases", "Ncontrols")
+      colNumbers = c(SNPID, CHR, POS, ALT, REF, BETA, SE, ZSTAT, N)
+      colNames = c("rsid", "chr", "pos", "alt", "ref", "beta", "se", "Z", "N")
       colNames = colNames[!is.na(colNumbers)]
       colNumbers = colNumbers[!is.na(colNumbers)]
 
 
       GWASData %>%
         dplyr::select(dplyr::all_of(colNumbers)) %>%
-        stats::setNames(colNames) %>%
-        dplyr::mutate(Ntot = .data$Ncases+.data$Ncontrols) -> GWASData_clean
+        stats::setNames(colNames) -> GWASData_clean
     }
   }
-
 
 
 
@@ -249,6 +227,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
   # + LDSC needs a p-value column
   if(!is.na(K_t)){
 
+
     delta_t = ((K_t^2 * (1-K_t)^2) / (P_t * (1-P_t))) *
       ( 1 / ( dnorm( qnorm(1-K_t)) )^2 )
 
@@ -258,7 +237,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
 
 
     GWASData_clean %>%
-      dplyr::mutate(std_beta = sqrt(delta_t)*.data$Z/sqrt(.data$Ntot+delta_t*theta_t*.data$Z^2),
+      dplyr::mutate(std_beta = sqrt(delta_t)*.data$Z/sqrt(.data$N+delta_t*theta_t*.data$Z^2),
                     std_SE = 1/.data$Z * std_beta,
                     #Z = std_beta/std_SE,
                     p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean
