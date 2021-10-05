@@ -80,26 +80,26 @@ To run the analysis with `MRlap` different inputs are needed:
 Can be a regular (space/tab/comma-separated) file or a gzipped file
 (.gz) or a `data.frame`. Must contain the following columns, which can
 have alternative names (not case sensitive):  
-<ul>
-SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid` <br>  
-Alternate (effect) allele: `a1` or `alt`, `alts` <br> Reference allele:
-`a2` or `a0`, `ref` <br> Z-statistics: `Z` or `zscore` <br> Sample size:
-`N` or `Neff`
-</ul>
+SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
+Alternate (effect) allele: `a1` or `alt`, `alts`  
+Reference allele: `a2`, `a0`, `ref`  
+Z-statistics: `Z`, `zscore`  
+Sample size: `N`, `Neff`
+
 If the Z-statistics is not present, it will be automatically calculated
 from effect size and standard error, in which case the following columns
 should be provided:  
-<ul>
-Effect-size: `b` or `beta`, `beta1` <br>  
-Standard error: `se` or `std`
-</ul>
+Effect-size: `b`, `beta`, `beta1` , `or`  
+Standard error: `se`, `std`
 
 *If (at least) one of the datasets is coming from a case-control
 GWAS:*  
 … the Sample size column should correspond to the effective sample size
-(not the total sample size). `Ncases` (number of cases) and `Ncontrols`
-can also be provided (instead or in addition to the effective sample
-size).  
+(not the total sample size). The number of cases and the number of
+controls can also be provided (instead or in addition to the effective
+sample size): Number of cases: `n_cases` `ncases`, `n_case`, `ncase`  
+Number of controls: `n_controls` `ncontrols`, `n_control`, `ncontrol`
+
 If the data has been analyzed using a linear model, there are two
 options:  
 - if the sample prevalence and the population prevalence are provided,
