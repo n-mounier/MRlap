@@ -15,7 +15,7 @@ sticker(imgurl,
         filename="inst/Figures/logo.png", dpi=2000) --->
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->
 
-:information\_source: `MRlap` is still under active development.
+:information\_source: `MRlap` is still under active development.  
 :information\_source: `MRlap` has been updated to version 0.0.1.  
 Check the [NEWS](NEWS.md) to learn more about what has been modified!
 
@@ -54,10 +54,7 @@ There is only one function available:
     corrected causal effect estimate.
 
 More details about its usage can be found in the
-[manual](doc/MRlap-manual.pdf).  
-Note that both the exposure and the outcome should be continuous traits,
-because our correction can not account for a different degree of overlap
-for cases/controls in case of binary traits.
+[manual](doc/MRlap-manual.pdf).
 
 ## Installation
 
@@ -84,17 +81,16 @@ Can be a regular (space/tab/comma-separated) file or a gzipped file
 (.gz) or a `data.frame`. Must contain the following columns, which can
 have alternative names (not case sensitive):  
 <ul>
-SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
-Alternate (effect) allele: `a1` or `alt`, `alts`  
-Reference allele: `a2` or `a0`, `ref`  
-Z-statistics: `Z` or `zscore`  
-Sample size: `N` or `Neff`
+SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid` <br>  
+Alternate (effect) allele: `a1` or `alt`, `alts` <br> Reference allele:
+`a2` or `a0`, `ref` <br> Z-statistics: `Z` or `zscore` <br> Sample size:
+`N` or `Neff`
 </ul>
 If the Z-statistics is not present, it will be automatically calculated
 from effect size and standard error, in which case the following columns
 should be provided:  
 <ul>
-Effect-size: `b` or `beta`, `beta1`  
+Effect-size: `b` or `beta`, `beta1` <br>  
 Standard error: `se` or `std`
 </ul>
 
