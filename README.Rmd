@@ -76,7 +76,7 @@ To run the analysis with `MRlap` different inputs are needed:
 
 #### 1. The exposure and outcome GWAS summary statistics (`exposure` & `outcome`):
 Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz) or a `data.frame`. Must contain the following columns, which can have alternative names (not case sensitive):    
-SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`      
+|   SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`      
 Alternate (effect) allele:  `a1` or `alt`, `alts`     
 Reference allele: `a2`, `a0`, `ref`     
 Z-statistics: `Z`, `zscore`   
@@ -268,20 +268,20 @@ B = MRlap(exposure = SmallExposure_Data,
 
 - MRcorrection
 
-<ul>    "observed_effect" : IVW-MR observed causal effect estimate,    
-        "observed_effect_se" : IVW-MR observed causal effect standard error,
+|   "observed_effect" : IVW-MR observed causal effect estimate,    
+|   "observed_effect_se" : IVW-MR observed causal effect standard error,
         "observed_effect_p" : IVW-MR observed causal effect p-value,   
         "corrected_effect" : corrected causal effect estimate,    
         "corrected_effect_se" : corrected causal effect standard error,   
         "corrected_effect_p" : corrected causal effect p-value, 
         "test_difference" : test statistic used to test for differences between observed and corrected effects,    
-        "p_difference" : p-value corresponding to the test statistic used to test for differences between observed and corrected effects.     </ul>     
+        "p_difference" : p-value corresponding to the test statistic used to test for differences between observed and corrected effects.    
 
 
         
 - LDSC
 
-<ul>    "h2_exp" : exposure heritability estimate,    
+|   "h2_exp" : exposure heritability estimate,    
         "h2_exp_se" : exposure heritability standard error,   
         "int_exp" : exposure intercept estimate,    
         "h2_out" : outcome heritability estimate,    
@@ -291,12 +291,12 @@ B = MRlap(exposure = SmallExposure_Data,
         "gcov_se" : genetic covariance standard error,     
         "rg" : genetic correlation estimate,    
         "int_crosstrait" : cross-trait intercept estimate,    
-        "int_crosstrait_se": cross-trait intercept standard error.     </ul>    
+        "int_crosstrait_se": cross-trait intercept standard error.       
 
 - GeneticArchitecture
 
-<ul>    "polygenicity" : exposure polygenicity estimate,    
-        "perSNP_heritability" : exposure per-SNP heritability estimate.     </ul> 
+|   "polygenicity" : exposure polygenicity estimate,    
+        "perSNP_heritability" : exposure per-SNP heritability estimate.     
    
 ##### Aditionnaly, if `save_logfiles=TRUE`, LDSC log files are created in the current working directory :
 -   **<exposure_name>.log** - exposure cleaning/munging log file   
