@@ -202,7 +202,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
         dplyr::select(dplyr::all_of(colNumbers)) %>%
         stats::setNames(colNames) %>%
         mutate(Ntot = .data$Ncases+.data$Ncontrols,
-               N = 4*data$Ncases*.data$Ncontrols/Ntot) -> GWASData_clean
+               N = 4*data$Ncases*.data$Ncontrols/.data$Ntot) -> GWASData_clean
     } else if(!getNeff & !getNtot){
       N = match(HeaderGWAS, GWASnames[["N"]])
       N = which(!is.na(N))[1]
