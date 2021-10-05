@@ -99,7 +99,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
 
 
   # sample size : if linear (or case-control without prevalences), should be N or Neff
-  if(is.na(K)){
+  if(is.na(K_t)){
     if(all(!HeaderGWAS %in% GWASnames[["N"]])) stop("no N column", call. = FALSE)
     tmp = c(tmp, paste0("N column, ok \n"))
     if(sum(HeaderGWAS %in% GWASnames[["N"]])>1) stop("multiple N columns, please provide only one", call. = FALSE)
@@ -158,7 +158,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
   ZSTAT = match(HeaderGWAS, GWASnames[["Z"]])
   ZSTAT = which(!is.na(ZSTAT))[1]
   # for the sample size, if case-control, make sure to have Neff and Ntot
-  if(is.na(K)){
+  if(is.na(K_t)){
     N = match(HeaderGWAS, GWASnames[["N"]])
     N = which(!is.na(N))[1]
 
