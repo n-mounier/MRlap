@@ -13,10 +13,11 @@ sticker(imgurl,
         s_x=0.95, s_y=0.90, s_width=0.95, # MRlap2
         # s_x=0.95, s_y=1.05, s_width=0.95, # MRlap
         filename="inst/Figures/logo.png", dpi=2000) --->
-
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->
 
 :information\_source: `MRlap` is still under active development.
+:information\_source: `MRlap` has been updated to version 0.0.1.  
+Check the [NEWS](NEWS.md) to learn more about what has been modified!
 
 ## Overview
 
@@ -33,6 +34,13 @@ differ from the observed effect, then IVW-MR estimate can be safely
 used. However, when there is a significant difference, corrected effects
 should be preferred as they should be less biased, independently of the
 sample overlap.  
+Note that we are working with standardised effects. This means that the
+causal effect estimates are in units of Standard Deviation (SD). The
+causal effect estimates correspond to the SD change in the outcome for
+one SD increase in the exposure. If case-control GWASs are used, the
+analysis can be perfomed on the liability scale (i.e. causal effect
+estimates correspond to the SD changes / increases on the liability
+scale).  
 This package builds up on the
 [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to
 perform cross-trait LDSC and the
@@ -41,7 +49,7 @@ inverse-variance weighted (IVW-)MR analysis (and instruments pruning).
 
 There is only one function available:
 
-  - **`MRlap()`**  
+-   **`MRlap()`**  
     main function that performs LDSC, IVW-MR analysis and provides a
     corrected causal effect estimate.
 
@@ -58,7 +66,7 @@ You can install the current version of `MRlap` with:
 ``` r
 # Directly install the package from github
 # install.packages("remotes")
-remotes::install_github("n-mounier/MRlap")
+remotes::install_github("n-mounier/MRlap", )
 library(MRlap)
 ```
 
@@ -70,39 +78,52 @@ see https://stackoverflow.com/questions/43595457/alternate-compiler-for-installi
 
 To run the analysis with `MRlap` different inputs are needed:
 
-#### 1\. The exposure and outcome GWAS summary statistics (`exposure` & `outcome`):
+#### 1. The exposure and outcome GWAS summary statistics (`exposure` & `outcome`):
 
 Can be a regular (space/tab/comma-separated) file or a gzipped file
 (.gz) or a `data.frame`. Must contain the following columns, which can
 have alternative names (not case sensitive):  
-
 <ul>
-
 SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
 Alternate (effect) allele: `a1` or `alt`, `alts`  
 Reference allele: `a2` or `a0`, `ref`  
 Z-statistics: `Z` or `zscore`  
-Sample size: `N`
-
+Sample size: `N` or `Neff`
 </ul>
-
 If the Z-statistics is not present, it will be automatically calculated
 from effect size and standard error, in which case the following columns
 should be provided:  
-
 <ul>
-
 Effect-size: `b` or `beta`, `beta1`  
 Standard error: `se` or `std`
-
 </ul>
 
-#### 2\. The input files for LDSC (`ld` & `hm3`):
+*If (at least) one of the datasets is coming from a case-control
+GWAS:*  
+… the Sample size column should correspond to the effective sample size
+(not the total sample size). `Ncases` (number of cases) and `Ncontrols`
+can also be provided (instead or in addition to the effective sample
+size).  
+If the data has been analyzed using a linear model, there are two
+options:  
+- if the sample prevalence and the population prevalence are provided,
+the analysis will be performed on the liability scale,  
+- if the sample prevalence and the population prevalence are not
+provided, the analysis will be perfomed on the observed scale (sililarly
+to what is done for continuous traits).  
+If the data has been analyzed using a logisitic model, the sample
+prevalence and the population prevalence need to be provided and the
+analysis will be performed on the liability scale. Additionally, in this
+case, if the Z-statistics is not present, the effect size column can
+either correspond to the odds ratio (`OR`) or to the log odds ratio (`b`
+or `beta`).
+
+#### 2. The input files for LDSC (`ld` & `hm3`):
 
 These are needed by the
 [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package.
 
-  - ld:
+-   ld:
 
 > Expects LD scores formated as required by the original LD score
 > regression software. Weights for the european population can be
@@ -111,16 +132,10 @@ These are needed by the
 > developers of LDSC):
 > <https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v>
 
-  - hm3:
+-   hm3:
 
-> We suggest using an (UNZIPPED) file of HAPMAP3 SNPs with some basic
-> cleaning applied (e.g., MHC region removed) that is supplied and
-> created by the original LD score regression developers and available
-> here:
-> <https://data.broadinstitute.org/alkesgroup/LDSCORE/w_hm3.snplist.bz2>
-> (with MHC region)  
-> The one without the MHC region (used in the examples) can be found
-> here: <https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v>
+> This file can be obtained from
+> <https://utexas.box.com/s/vkd36n197m8klbaio3yzoxsee6sxo11v>.
 
 ### Analysis
 
@@ -128,9 +143,7 @@ Before running the examples, please make sure to have downloaded the
 input files for LDSC. You may also need to modify the `ld` & `hm3`
 parameters to indicate the correct paths.
 
-  - **Example A**
-
-<!-- end list -->
+-   **Example A**
 
 ``` r
 # Using ~100K samples for BMI/SBP, with 0% of sample overlap
@@ -153,8 +166,9 @@ A = MRlap(exposure = BMI,
 ```
 
 <details>
-
-<summary>Show log</summary>
+<summary>
+Show log
+</summary>
 
     ```
     ## <<< Preparation of analysis >>> 
@@ -189,17 +203,16 @@ A = MRlap(exposure = BMI,
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.115 ( 0.0535 ) 
-    ##      covariance between observed and corrected effect: 0.00215   
+    ##      corrected effect: 0.115 ( 0.0532 ) 
+    ##      covariance between observed and corrected effect: 0.00212   
+    ##            5000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  4  minute(s) and  36  second(s).
+    ##  Runtime of the analysis:  2  minute(s) and  48  second(s).
     ```
 
 </details>
 
-  - **Example B**
-
-<!-- end list -->
+-   **Example B**
 
 ``` r
 # Using simulated exposure/outcome data 
@@ -222,8 +235,9 @@ B = MRlap(exposure = SmallExposure_Data,
 ```
 
 <details>
-
-<summary>Show log</summary>
+<summary>
+Show log
+</summary>
 
     ```
     ## <<< Preparation of analysis >>> 
@@ -249,20 +263,21 @@ B = MRlap(exposure = SmallExposure_Data,
     ##  <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ##  <<< Running IVW-MR >>>   
     ##  > Identifying IVs...  
-    ##      331 IVs with p < 5e-10  
+    ##      215 IVs with p < 5e-10  
     ##      0 IVs excluded - more strongly associated with the outcome than with the exposure, p < 1e-03  
     ##     Pruning : distance :  500 Kb  - LD threshold :  0.05  
-    ##      39 IVs left after pruning  
+    ##      36 IVs left after pruning  
     ##  > Performing MR  
-    ##      IVW-MR observed effect: 0.223 ( 0.0228 ) 
+    ##      IVW-MR observed effect: 0.223 ( 0.0227 ) 
     ##  <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.207 ( 0.0257 ) 
-    ##      covariance between observed and corrected effect: 0.000586  
+    ##      corrected effect: 0.204 ( 0.0259 ) 
+    ##      covariance between observed and corrected effect: 0.000588  
+    ##            4000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  5  minute(s) and  48  second(s).
+    ##  Runtime of the analysis:  2  minute(s) and  42  second(s).
     ```
 
 </details>
@@ -271,25 +286,24 @@ B = MRlap(exposure = SmallExposure_Data,
 
 **`MRlap()`** returns a named list containing the following results:
 
-  - MRcorrection
+-   MRcorrection
 
 <ul>
-
 “observed\_effect” : IVW-MR observed causal effect estimate,  
-“observed\_effect\_se” : IVW-MR observed causal effect standard error,  
+“observed\_effect\_se” : IVW-MR observed causal effect standard error,
+“observed\_effect\_p” : IVW-MR observed causal effect p-value,  
 “corrected\_effect” : corrected causal effect estimate,  
 “corrected\_effect\_se” : corrected causal effect standard error,  
+“corrected\_effect\_p” : corrected causal effect p-value,
 “test\_difference” : test statistic used to test for differences between
 observed and corrected effects,  
 “p\_difference” : p-value corresponding to the test statistic used to
 test for differences between observed and corrected effects.
-
 </ul>
 
-  - LDSC
+-   LDSC
 
 <ul>
-
 “h2\_exp” : exposure heritability estimate,  
 “h2\_exp\_se” : exposure heritability standard error,  
 “int\_exp” : exposure intercept estimate,  
@@ -301,30 +315,25 @@ test for differences between observed and corrected effects.
 “rg” : genetic correlation estimate,  
 “int\_crosstrait” : cross-trait intercept estimate,  
 “int\_crosstrait\_se”: cross-trait intercept standard error.
-
 </ul>
 
-  - GeneticArchitecture
+-   GeneticArchitecture
 
 <ul>
-
 “polygenicity” : exposure polygenicity estimate,  
 “perSNP\_heritability” : exposure per-SNP heritability estimate.
-
 </ul>
 
 ##### Aditionnaly, if `save_logfiles=TRUE`, LDSC log files are created in the current working directory :
 
-  - **<exposure_name>.log** - exposure cleaning/munging log file  
+-   **<exposure_name>.log** - exposure cleaning/munging log file  
 
-  - **<outcome_name>.log** - outcome cleaning/munging log file  
+-   **<outcome_name>.log** - outcome cleaning/munging log file  
 
-  - **<exposure_name>.sumstats.gz\_<outcome_name>.sumstats.gzldsc.log**
-    - cross-trait LDSC log file
+-   **<exposure_name>.sumstats.gz\_<outcome_name>.sumstats.gzldsc.log** -
+    cross-trait LDSC log file
 
-  - **Example A**
-
-<!-- end list -->
+-   **Example A**
 
 ``` r
 # structure of the results
@@ -332,13 +341,15 @@ str(A)
 ```
 
     ## List of 3
-    ##  $ MRcorrection       :List of 6
+    ##  $ MRcorrection       :List of 8
     ##   ..$ observed_effect    : num 0.0856
     ##   ..$ observed_effect_se : num 0.0398
+    ##   ..$ observed_effect_p  : num 0.0315
     ##   ..$ corrected_effect   : num 0.115
-    ##   ..$ corrected_effect_se: num 0.0535
-    ##   ..$ test_difference    : num -2.36
-    ##   ..$ p_difference       : num 0.0184
+    ##   ..$ corrected_effect_se: num 0.0532
+    ##   ..$ corrected_effect_p : num 0.0313
+    ##   ..$ test_difference    : num -2.21
+    ##   ..$ p_difference       : num 0.0273
     ##  $ LDSC               :List of 11
     ##   ..$ h2_exp           : num 0.244
     ##   ..$ h2_exp_se        : num 0.0107
@@ -352,7 +363,7 @@ str(A)
     ##   ..$ int_crosstrait   : num -0.0011
     ##   ..$ int_crosstrait_se: num 0.0063
     ##  $ GeneticArchitecture:List of 2
-    ##   ..$ polygenicity       : num 0.00701
+    ##   ..$ polygenicity       : num 0.00702
     ##   ..$ perSNP_heritability: num 3.02e-05
 
 ``` r
@@ -360,10 +371,10 @@ str(A)
 unlist(A[["MRcorrection"]])
 ```
 
-    ##     observed_effect  observed_effect_se    corrected_effect corrected_effect_se 
-    ##          0.08560606          0.03980045          0.11457176          0.05353010 
-    ##     test_difference        p_difference 
-    ##         -2.35838564          0.01835461
+    ##     observed_effect  observed_effect_se   observed_effect_p    corrected_effect 
+    ##          0.08560606          0.03980045          0.03148552          0.11457158 
+    ## corrected_effect_se  corrected_effect_p     test_difference        p_difference 
+    ##          0.05321401          0.03131599         -2.20655541          0.02734514
 
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
@@ -381,30 +392,28 @@ unlist(A[["LDSC"]])
     ##                rg    int_crosstrait int_crosstrait_se 
     ##       0.192095266      -0.001101472       0.006300000
 
-  - **Example B**
-
-<!-- end list -->
+-   **Example B**
 
 ``` r
 # observed effect
 B[["MRcorrection"]]$observed_effect
 ```
 
-    ## [1] 0.2234165
+    ## [1] 0.2226876
 
 ``` r
 # corrected effect
 B[["MRcorrection"]]$corrected_effect
 ```
 
-    ## [1] 0.2065657
+    ## [1] 0.2043047
 
 ``` r
 # difference p-value
 B[["MRcorrection"]]$p_difference
 ```
 
-    ## [1] 8.260064e-13
+    ## [1] 1.967183e-09
 
 ``` r
 # in this case, we observed that the the observed effect estimate obtained using IVW 
@@ -416,25 +425,24 @@ unlist(B[["GeneticArchitecture"]])
 ```
 
     ##        polygenicity perSNP_heritability 
-    ##        0.0008447576        0.0004078613
+    ##        0.0009415670        0.0003768239
 
 ## Runtime
 
-Example A \~ 4 minutes 30 seconds
+Example A \~ 3 minutes 50
 
-Example B \~ 6 minutes
+Example B \~ 2 minutes 40 seconds
 
 The runtime can be influenced by the size of the summary statistics
-files, the approach used for pruning (distance vs LD) but also by `s`,
-the number of simulations used for the sampling strategy to estimate the
+files, the approach used for pruning (distance vs LD) but also by the
+number of simulations used for the sampling strategy to estimate the
 variance of the corrected causal effect and the covariance between
-observed and corrected effects (type `?MRlap` to get details). However,
-reducing the value of `s` is strongly discouraged as it can lead to an
-innacurate estimation of the corrected effect standard error.
+observed and corrected effects (optimal number of simulations is
+automatically determined in the analysis).
 
 <font color="grey"><small> Results from analyses performed on a MacBook
-Pro (Early 2015) - Processor : 2.9 GHz Intel Core i5 - Memory : 8 GB
-1867 MHz DDR3.</font> </small>
+Pro (2020) - Processor : 2 GHz Quad-Core Intel Core i5 - Memory : 16 GB
+3733 MHz LPDDR4X.</font> </small>
 
 ## Citation
 
