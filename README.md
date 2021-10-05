@@ -297,8 +297,7 @@ test for differences between observed and corrected effects.
 
 -   LDSC
 
-  “h2\_exp” : exposure heritability estimate,
-
+“h2\_exp” : exposure heritability estimate,  
 “h2\_exp\_se” : exposure heritability standard error,  
 “int\_exp” : exposure intercept estimate,  
 “h2\_out” : outcome heritability estimate,  

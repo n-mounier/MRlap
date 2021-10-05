@@ -76,7 +76,7 @@ To run the analysis with `MRlap` different inputs are needed:
 
 #### 1. The exposure and outcome GWAS summary statistics (`exposure` & `outcome`):
 Can be a regular (space/tab/comma-separated) file or a gzipped file (.gz) or a `data.frame`. Must contain the following columns, which can have alternative names (not case sensitive):    
-SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`      
+\hspace{1cm} SNP-identifier:  `rs` or `rsid`, `snp`, `snpid`, `rnpid`      
 Alternate (effect) allele:  `a1` or `alt`, `alts`     
 Reference allele: `a2`, `a0`, `ref`     
 Z-statistics: `Z`, `zscore`   
@@ -268,7 +268,7 @@ B = MRlap(exposure = SmallExposure_Data,
 
 - MRcorrection
 
-"observed_effect" : IVW-MR observed causal effect estimate,      
+"observed_effect" : IVW-MR observed causal effect estimate,   
 "observed_effect_se" : IVW-MR observed causal effect standard error,     
 "observed_effect_p" : IVW-MR observed causal effect p-value,      
 "corrected_effect" : corrected causal effect estimate,      
@@ -281,7 +281,7 @@ B = MRlap(exposure = SmallExposure_Data,
         
 - LDSC
 
-|   "h2_exp" : exposure heritability estimate,     
+"h2_exp" : exposure heritability estimate,      
 "h2_exp_se" : exposure heritability standard error,     
 "int_exp" : exposure intercept estimate,      
 "h2_out" : outcome heritability estimate,      
