@@ -115,9 +115,8 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
       tmp = c(tmp, paste0("N (cases and controls) columns, ok \n"))
       getNtot=FALSE
     }
-  }
   if(getNeff & getNtot) stop("no N column", call. = FALSE)
-
+  }
     # if(sum(HeaderGWAS %in% GWASnames[["N"]]) + sum(HeaderGWAS %in% GWASnames[["Ncases"]])>1) stop("multiple N columns (effective sample size + case / control sample sizes), please provide only one", call. = FALSE)
     # if(sum(HeaderGWAS %in% GWASnames[["N"]]) + sum(HeaderGWAS %in% GWASnames[["Ncontrols"]])>1) stop("multiple N columns (effective sample size + case / control sample sizes), please provide only one", call. = FALSE)
 
