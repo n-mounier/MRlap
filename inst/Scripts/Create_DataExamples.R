@@ -47,9 +47,9 @@ saveRDS(A, file="~/Documents/SGG/Projects/MRlap/inst/Data/A.RDS")
 data("SmallExposure_Data")
 data("SmallOutcome_Data")
 
-B = MRlap(exposure = Exposure_Data,
+B = MRlap(exposure = SmallExposure_Data,
           exposure_name = "simulated_exposure",
-          outcome = Outcome_Data,
+          outcome = SmallOutcome_Data,
           outcome_name = "simulated_outcome",
           ld = "~/eur_w_ld_chr",
           hm3 = "~/w_hm3.noMHC.snplist",
