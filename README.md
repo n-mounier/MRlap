@@ -80,7 +80,7 @@ To run the analysis with `MRlap` different inputs are needed:
 Can be a regular (space/tab/comma-separated) file or a gzipped file
 (.gz) or a `data.frame`. Must contain the following columns, which can
 have alternative names (not case sensitive):  
-\| SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
+SNP-identifier: `rs` or `rsid`, `snp`, `snpid`, `rnpid`  
 Alternate (effect) allele: `a1` or `alt`, `alts`  
 Reference allele: `a2`, `a0`, `ref`  
 Z-statistics: `Z`, `zscore`  
@@ -284,31 +284,35 @@ Show log
 
 -   MRcorrection
 
-  “observed\_effect” : IVW-MR observed causal effect estimate,  
-  “observed\_effect\_se” : IVW-MR observed causal effect standard error,
-“observed\_effect\_p” : IVW-MR observed causal effect p-value,
-“corrected\_effect” : corrected causal effect estimate,
-“corrected\_effect\_se” : corrected causal effect standard error,
-“corrected\_effect\_p” : corrected causal effect p-value,
+“observed\_effect” : IVW-MR observed causal effect estimate,  
+“observed\_effect\_se” : IVW-MR observed causal effect standard error,  
+“observed\_effect\_p” : IVW-MR observed causal effect p-value,  
+“corrected\_effect” : corrected causal effect estimate,  
+“corrected\_effect\_se” : corrected causal effect standard error,  
+“corrected\_effect\_p” : corrected causal effect p-value,  
 “test\_difference” : test statistic used to test for differences between
-observed and corrected effects, “p\_difference” : p-value corresponding
-to the test statistic used to test for differences between observed and
-corrected effects.
+observed and corrected effects,  
+“p\_difference” : p-value corresponding to the test statistic used to
+test for differences between observed and corrected effects.
 
 -   LDSC
 
-  “h2\_exp” : exposure heritability estimate, “h2\_exp\_se” : exposure
-heritability standard error, “int\_exp” : exposure intercept estimate,
-“h2\_out” : outcome heritability estimate, “h2\_out\_se” : outcome
-heritability standard error, “int\_out” : outcome intercept estimate,
-“gcov” : genetic covariance estimate, “gcov\_se” : genetic covariance
-standard error, “rg” : genetic correlation estimate, “int\_crosstrait” :
-cross-trait intercept estimate, “int\_crosstrait\_se”: cross-trait
-intercept standard error.
+  “h2\_exp” : exposure heritability estimate,
+
+“h2\_exp\_se” : exposure heritability standard error,  
+“int\_exp” : exposure intercept estimate,  
+“h2\_out” : outcome heritability estimate,  
+“h2\_out\_se” : outcome heritability standard error,  
+“int\_out” : outcome intercept estimate,  
+“gcov” : genetic covariance estimate,  
+“gcov\_se” : genetic covariance standard error,  
+“rg” : genetic correlation estimate,  
+“int\_crosstrait” : cross-trait intercept estimate,  
+“int\_crosstrait\_se”: cross-trait intercept standard error.
 
 -   GeneticArchitecture
 
-  “polygenicity” : exposure polygenicity estimate,
+“polygenicity” : exposure polygenicity estimate,  
 “perSNP\_heritability” : exposure per-SNP heritability estimate.
 
 ##### Aditionnaly, if `save_logfiles=TRUE`, LDSC log files are created in the current working directory :
