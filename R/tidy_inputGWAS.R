@@ -107,7 +107,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
   #               if case-control with prevalence, should be N or Neff and/or (Ncases + Ncontrols)
     getNeff = TRUE
     getNtot = TRUE
-    if(!all(HeaderGWAS %in% GWASnames[["N"]])){
+    if(all(HeaderGWAS %in% GWASnames[["N"]])){
       tmp = c(tmp, paste0("N column, ok \n"))
       getNeff=FALSE
     }
@@ -185,7 +185,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
       GWASData %>%
         dplyr::select(dplyr::all_of(colNumbers)) %>%
         stats::setNames(colNames) %>%
-        mutate(Ntot = .data$N/(4 * P_t * (1-P_t))) -> GWASData_clean
+        dplyr::mutate(Ntot = .data$N/(4 * P_t * (1-P_t))) -> GWASData_clean
     } else if(getNeff & !getNtot){
       N_cases = match(HeaderGWAS, GWASnames[["Ncases"]])
       N_cases = which(!is.na(N_cases))[1]
@@ -201,8 +201,8 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
       GWASData %>%
         dplyr::select(dplyr::all_of(colNumbers)) %>%
         stats::setNames(colNames) %>%
-        mutate(Ntot = .data$Ncases+.data$Ncontrols,
-               N = 4*data$Ncases*.data$Ncontrols/.data$Ntot) -> GWASData_clean
+        dplyr::mutate(Ntot = .data$Ncases+.data$Ncontrols,
+                      N = 4*.data$Ncases*.data$Ncontrols/.data$Ntot) -> GWASData_clean
     } else if(!getNeff & !getNtot){
       N = match(HeaderGWAS, GWASnames[["N"]])
       N = which(!is.na(N))[1]
@@ -220,7 +220,7 @@ tidy_inputGWAS <- function(GWAS, K_t=NA, P_t=NA, verbose=FALSE){
       GWASData %>%
         dplyr::select(dplyr::all_of(colNumbers)) %>%
         stats::setNames(colNames) %>%
-        mutate(Ntot = .data$Ncases+.data$Ncontrols) -> GWASData_clean
+        dplyr::mutate(Ntot = .data$Ncases+.data$Ncontrols) -> GWASData_clean
     }
   }
 
