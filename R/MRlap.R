@@ -119,11 +119,11 @@ MRlap <- function(exposure,
   ## case-control exposure
   if(!is.na(K_exposure) & !is.numeric(K_exposure)) stop("K_exposure : non-numeric argument")
   if(!is.na(K_exposure) & K_exposure>1) stop("K_exposure : should be smaller than 1")
-  if(!is.na(K_exposure) & K_exposure<1) stop("K_exposure : should be larger than 0")
+  if(!is.na(K_exposure) & K_exposure<0) stop("K_exposure : should be larger than 0")
 
   if(!is.na(P_exposure) & !is.numeric(P_exposure)) stop("P_exposure : non-numeric argument")
   if(!is.na(P_exposure) & P_exposure>1) stop("P_exposure : should be smaller than 1")
-  if(!is.na(P_exposure) & P_exposure<1) stop("P_exposure : should be larger than 0")
+  if(!is.na(P_exposure) & P_exposure<0) stop("P_exposure : should be larger than 0")
 
   if(!is.na(P_exposure) & is.na(K_exposure)) stop("Both K_exposure and P_exposure should be provided")
   if(!is.na(K_exposure) & is.na(P_exposure)) stop("Both K_exposure and P_exposure should be provided")
@@ -133,11 +133,11 @@ MRlap <- function(exposure,
   ## case-control outcome
   if(!is.na(K_outcome) & !is.numeric(K_outcome)) stop("K_outcome : non-numeric argument")
   if(!is.na(K_outcome) & K_outcome>1) stop("K_outcome : should be smaller than 1")
-  if(!is.na(K_outcome) & K_outcome<1) stop("K_outcome : should be larger than 0")
+  if(!is.na(K_outcome) & K_outcome<0) stop("K_outcome : should be larger than 0")
 
   if(!is.na(P_outcome) & !is.numeric(P_outcome)) stop("P_outcome : non-numeric argument")
   if(!is.na(P_outcome) & P_outcome>1) stop("P_outcome : should be smaller than 1")
-  if(!is.na(P_outcome) & P_outcome<1) stop("P_outcome : should be larger than 0")
+  if(!is.na(P_outcome) & P_outcome<0) stop("P_outcome : should be larger than 0")
 
   if(!is.na(P_outcome) & is.na(K_outcome)) stop("Both K_outcome and P_outcome should be provided")
   if(!is.na(K_outcome) & is.na(P_outcome)) stop("Both K_outcome and P_outcome should be provided")
