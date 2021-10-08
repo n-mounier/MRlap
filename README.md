@@ -16,7 +16,9 @@ sticker(imgurl,
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->
 
 :information\_source: `MRlap` is still under active development.  
-:information\_source: `MRlap` has been updated to version 0.0.1.  
+:information\_source: `MRlap` has been updated to version 0.0.1. Note
+that some features of this version (including the use of case-control
+data) are still being tested.  
 Check the [NEWS](NEWS.md) to learn more about what has been modified!
 
 ## Overview
