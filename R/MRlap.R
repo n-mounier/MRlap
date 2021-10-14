@@ -8,13 +8,9 @@
 #' @param exposure The path to the file containing the GWAS summary statistics for the exposure,
 #'        or a \code{data.frame} (character, or \code{data.frame})
 #' @param exposure_name The name of the exposure trait, \code{default="exposure"} (character)
-#' @param K_exposure If case-control exposure, prevalence in the population, \code{default=NA for continuous traits} (numeric)
-#' @param P_exposure If case-control exposure, prevalence in the sample, \code{default=NA for continuous traits} (numeric)
 #' @param outcome  The path to the file containing the GWAS summary statistics for the exposure,
 #'        or a \code{data.frame} (character, or \code{data.frame})
 #' @param outcome_name The name of the outcome trait, \code{default="outcome"} (character)
-#' @param K_outcome If case-control outcome, prevalence in the population, \code{default=NA for continuous traits} (numeric)
-#' @param P_outcome If case-control outcome, prevalence in the sample, \code{default=NA for continuous traits} (numeric)
 #' @param ld The path to the folder in which the LD scores used in the analysis are located.
 #'        Expects LD scores formated as required by the original LD score regression software.  (character)
 #' @param hm3 The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
@@ -50,21 +46,13 @@
 #' SE should be : \code{se}, \code{std} \cr
 #' If (at least) one of the datasets is coming from a case-control GWAS:*
 #' The Sample size column should correspond to the total sample size.
-#' The number of cases (NCASES) and the number of controls (NCONTROLS) can also be provided (instead of the total sample size).
-#' NCASES should be : \code{n_cases}, \code{ncases}, \code{n_case}, \code{ncase} \cr
-#' NCONTROLS should be : \code{n_controls}, \code{ncontrols}, \code{n_control}, \code{ncontrol} \cr
-#'
 #' @importFrom rlang .data
 #' @export
 
 MRlap <- function(exposure,
                   exposure_name = NULL,
-                  K_exposure = NA,
-                  P_exposure = NA,
                   outcome,
                   outcome_name = NULL,
-                  K_outcome = NA,
-                  P_outcome = NA,
                   ld,
                   hm3,
                   MR_threshold = 5e-8,
@@ -116,34 +104,6 @@ MRlap <- function(exposure,
     hm3 = normalizePath(hm3)
   } else stop("hm3 : wrong format, should be character", call. = FALSE)
 
-  ## case-control exposure
-  if(!is.na(K_exposure) & !is.numeric(K_exposure)) stop("K_exposure : non-numeric argument")
-  if(!is.na(K_exposure) & K_exposure>1) stop("K_exposure : should be smaller than 1")
-  if(!is.na(K_exposure) & K_exposure<0) stop("K_exposure : should be larger than 0")
-
-  if(!is.na(P_exposure) & !is.numeric(P_exposure)) stop("P_exposure : non-numeric argument")
-  if(!is.na(P_exposure) & P_exposure>1) stop("P_exposure : should be smaller than 1")
-  if(!is.na(P_exposure) & P_exposure<0) stop("P_exposure : should be larger than 0")
-
-  if(!is.na(P_exposure) & is.na(K_exposure)) stop("Both K_exposure and P_exposure should be provided")
-  if(!is.na(K_exposure) & is.na(P_exposure)) stop("Both K_exposure and P_exposure should be provided")
-
-  if(!is.na(K_exposure) & !is.na(P_exposure) & verbose) cat("The exposure is a binary trait ( population prevalence:", K_exposure, "- sample prevalence:", P_exposure ,")\n")
-
-  ## case-control outcome
-  if(!is.na(K_outcome) & !is.numeric(K_outcome)) stop("K_outcome : non-numeric argument")
-  if(!is.na(K_outcome) & K_outcome>1) stop("K_outcome : should be smaller than 1")
-  if(!is.na(K_outcome) & K_outcome<0) stop("K_outcome : should be larger than 0")
-
-  if(!is.na(P_outcome) & !is.numeric(P_outcome)) stop("P_outcome : non-numeric argument")
-  if(!is.na(P_outcome) & P_outcome>1) stop("P_outcome : should be smaller than 1")
-  if(!is.na(P_outcome) & P_outcome<0) stop("P_outcome : should be larger than 0")
-
-  if(!is.na(P_outcome) & is.na(K_outcome)) stop("Both K_outcome and P_outcome should be provided")
-  if(!is.na(K_outcome) & is.na(P_outcome)) stop("Both K_outcome and P_outcome should be provided")
-
-  if(!is.na(K_outcome) & !is.na(P_outcome) & verbose) cat("The outcome is a binary trait ( population prevalence:", K_outcome, "- sample prevalence:", P_outcome ,")\n")
-
 
   ## MR_threshold -> should not be larger than 10-5, can only be more stringent
   if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
@@ -176,10 +136,10 @@ MRlap <- function(exposure,
 
   if(verbose) cat(paste0("> Processing exposure ", ifelse(is.null(exposure_name), "", paste0("(",exposure_name,") ")) ,"summary statistics... \n"))
   if(is.null(exposure_name)) exposure_name="exposure"
-  exposure_data = tidy_inputGWAS(exposure, K_exposure, P_exposure, verbose)
+  exposure_data = tidy_inputGWAS(exposure, verbose)
   if(verbose) cat(paste0("> Processing outcome ", ifelse(is.null(outcome_name), "", paste0("(",outcome_name,") ")) ,"summary statistics... \n"))
   if(is.null(outcome_name)) outcome_name="outcome"
-  outcome_data = tidy_inputGWAS(outcome, K_outcome, P_outcome, verbose)
+  outcome_data = tidy_inputGWAS(outcome, verbose)
 
 
 
@@ -187,8 +147,8 @@ MRlap <- function(exposure,
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Performing cross-trait LDSC >>>  \n")
   # returns h2 exposure - SE h2 exposure - cross-trait intercept - SE cross-trait intercept
-  LDSC_results = run_LDSC(exposure_data, exposure_name, K_exposure, P_exposure,
-                          outcome_data, outcome_name, K_outcome, P_outcome, ld, hm3, save_logfiles, verbose)
+  LDSC_results = run_LDSC(exposure_data, exposure_name,
+                          outcome_data, outcome_name, ld, hm3, save_logfiles, verbose)
   # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
   #     int_exp, int_out,  h2_out, h2_out_se, rgcov, rgcov_se, rg
 

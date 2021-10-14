@@ -39,10 +39,17 @@ sample overlap.
 Note that we are working with standardised effects. This means that the
 causal effect estimates are in units of Standard Deviation (SD). The
 causal effect estimates correspond to the SD change in the outcome for
-one SD increase in the exposure. If case-control GWASs are used, the
-analysis can be perfomed on the liability scale (i.e. causal effect
-estimates correspond to the SD changes / increases on the liability
-scale).  
+one SD increase in the exposure.  
+It is possible to use case-control GWASs, but it is important to note
+that our method assumes that sample overlap should be independend of
+case-control status. Morever, the analysis needs to be performed on the
+observed scale. This means that GWAS results (from a linear model using
+case-control status or from a logisitic regression) should be provided
+alongside the total (number of cases + number of controls) sample size.
+In such cases, the heritability estimates reported in the results will
+be different to the ones that are usually estimated (on the liability
+scale), this is normal. The causal effect estimates correspond to the SD
+changes / increases on the observed scale.  
 This package builds up on the
 [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to
 perform cross-trait LDSC and the
@@ -97,24 +104,7 @@ Standard error: `se`, `std`
 *If (at least) one of the datasets is coming from a case-control
 GWAS:*  
 … the Sample size column should correspond to the total sample size (not
-the effective sample size!!). The number of cases and the number of
-controls can also be provided (instead of the total sample size):  
-Number of cases: `n_cases` `ncases`, `n_case`, `ncase`  
-Number of controls: `n_controls` `ncontrols`, `n_control`, `ncontrol`
-
-If the data has been analyzed using a linear model, there are two
-options:  
-- if the sample prevalence and the population prevalence are provided,
-the analysis will be performed on the liability scale,  
-- if the sample prevalence and the population prevalence are not
-provided, the analysis will be perfomed on the observed scale (sililarly
-to what is done for continuous traits).  
-If the data has been analyzed using a logisitic model, the sample
-prevalence and the population prevalence need to be provided and the
-analysis will be performed on the liability scale. Additionally, in this
-case, if the Z-statistics is not present, the effect size column can
-either correspond to the odds ratio (`OR`) or to the log odds ratio (`b`
-or `beta`).
+the effective sample size!!).
 
 #### 2. The input files for LDSC (`ld` & `hm3`):
 

@@ -16,12 +16,8 @@
 
 run_LDSC <- function(exposure_data,
                      exposure_name,
-                     K_exposure,
-                     P_exposure,
                      outcome_data,
                      outcome_name,
-                     K_outcome,
-                     P_outcome,
                      ld, hm3, save_logfiles, verbose){
 
   # write down exposure/outcome data
@@ -45,8 +41,8 @@ run_LDSC <- function(exposure_data,
 
   traits <- c(paste0(exposure_name, ".sumstats.gz"),
               paste0(outcome_name, ".sumstats.gz"))
-  sample.prev <- c(P_exposure,P_outcome) # continuous traits
-  population.prev <- c(K_exposure,K_outcome) # continuous traits
+  sample.prev <- c(NA,NA) # continuous traits
+  population.prev <- c(NA,NA) # continuous traits
 
   trait.names<-c(exposure_name, outcome_name)
 
@@ -69,21 +65,6 @@ run_LDSC <- function(exposure_data,
 
   # if case-control, we need to rescale the intercept: ... * sqrt(Ntot/Neff)
   gcov_int = as.numeric(LDSCoutput$I[1,2])
-  if(is.na(K_exposure) & !is.na(K_outcome)){
-    N_tot_outcome = median(outcome_data$N)
-    N_eff_outcome = 4 * N_tot_outcome * K_outcome * N_tot_outcome * (1 - K_outcome) / N_tot_outcome
-    gcov_int = gcov_int * sqrt(N_tot_outcome / N_eff_outcome)
-  } else if(!is.na(K_exposure) & is.na(K_outcome)){
-    N_tot_exposure = median(exposure_data$N)
-    N_eff_exposure = 4 * N_tot_exposure * K_exposure * N_tot_exposure * (1 - K_exposure) / N_tot_exposure
-    gcov_int = gcov_int * sqrt(N_tot_exposure / N_eff_exposure)
-  } else if(!is.na(K_exposure) & !is.na(K_outcome)){
-    N_tot_exposure = median(exposure_data$N)
-    N_eff_exposure = 4 * N_tot_exposure * K_exposure * N_tot_exposure * (1 - K_exposure) / N_tot_exposure
-    N_tot_outcome = median(outcome_data$N)
-    N_eff_outcome = 4 * N_tot_outcome * K_outcome * N_tot_outcome * (1 - K_outcome) / N_tot_outcome
-    gcov_int = gcov_int * sqrt(N_tot_exposure / N_eff_exposure) * sqrt(N_tot_outcome / N_eff_outcome)
-  }
 
   output = readLines(paste0(c(traits, "ldsc.log"), collapse="_"))
   gcov_int_SE = as.numeric(stringr::str_replace(stringr::str_split(output[stringr::str_detect(output, "Cross trait Intercept")], "\\(" )[[1]][2], "\\)", ""))
