@@ -141,11 +141,12 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     res %>%
       dplyr::group_by((row_number()-1) %/% (n()/num_groups)) %>%
       tidyr::nest() %>% pull(data) -> res_subsets
-    subsets_se = unlist(lapply(res_subsets, function(x) stats::sd(x$corrected)))
+    subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
     subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 
+    # check coeffificent(s) of variation
     needmore = F
-    if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
+    if(stats::sd(subsets_var) / base::mean(subsets_var) > sthreshold) needmore=T
     if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
     if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
 
@@ -154,11 +155,11 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
       res %>%
         dplyr::group_by((row_number()-1) %/% (n()/num_groups)) %>%
         tidyr::nest() %>% pull(data) -> res_subsets
-      subsets_se = unlist(lapply(res_subsets, function(x) stats::sd(x$corrected)))
+      subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
       subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 
       needmore = F
-      if(stats::sd(subsets_se) / base::mean(subsets_se) > sthreshold) needmore=T
+      if(stats::sd(subsets_var) / base::mean(subsets_var) > sthreshold) needmore=T
       if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
       if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
     }

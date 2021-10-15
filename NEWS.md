@@ -1,4 +1,4 @@
-# MRlap 0.0.1.0 (2021-10-05)
+# MRlap 0.0.1.0 (2021-10-15)
 
 ## Changes
 - Case-control GWAS    
@@ -9,11 +9,11 @@ The analysis is performed on the observed scale (explaining why heritability est
 
 - optimal number of simulations to estimate SE/COV
 
-The number of simulation used to estimate the standard error of the corrected effect and the covariance between corrected and observed effect is no longer a parameter that needs to be chosen before running the analysis. This could be a problem if the value was too small, the SE/COV estimates were too noisy to correcly test for the difference between observed and corrected effects. The optimal value is now automatically determined when running the analysis. 
+The number of simulation used to estimate the standard error of the corrected effect and the covariance between corrected and observed effect is no longer a parameter that needs to be chosen before running the analysis. This could be a problem if the value was too small, the SE/COV estimates were too noisy to correcly test for the difference between observed and corrected effects. The optimal value is now automatically determined when running the analysis (using the coefficients of variation for the variance of the corrected effect and covariance between corrected and observed effect). 
 
-- p-value estimation for observed and corrected effects
+- p-value estimation for observed and corrected effects / number of IVs
 
-The p-values are now reported for both observed and corrected effects.
+The p-values are now reported for both observed and corrected effects, as well as the number of instruments used.
 
 # MRlap 0.0.0.9 (2021-03-04)
 

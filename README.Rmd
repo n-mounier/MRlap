@@ -170,11 +170,11 @@ A = MRlap(exposure = BMI,
         "<<< Estimating corrected effect >>>   \n",
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
-        "    corrected effect: 0.115 ( 0.0531 ) \n",
+        "    corrected effect: 0.115 ( 0.0532 ) \n",
         "    covariance between observed and corrected effect: 0.00212   \n",
-        "          9000 simulations were used to estimate the variance and the covariance.\n",
+        "          6000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  38  second(s). \n")
+        "Runtime of the analysis:  3  minute(s) and  0  second(s). \n")
     ```
 
     
@@ -242,11 +242,11 @@ B = MRlap(exposure = SmallExposure_Data,
         "<<< Estimating corrected effect >>>   \n",
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
-        "    corrected effect: 0.204 ( 0.0257 ) \n",
-        "    covariance between observed and corrected effect: 0.000582  \n",
-        "          11000 simulations were used to estimate the variance and the covariance.\n",
+        "    corrected effect: 0.204 ( 0.026 ) \n",
+        "    covariance between observed and corrected effect: 0.000597  \n",
+        "          24000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  49  second(s). \n")
+        "Runtime of the analysis:  5  minute(s) and  47  second(s). \n")
     ```
 
     
@@ -332,9 +332,9 @@ unlist(B[["GeneticArchitecture"]])
 ## Runtime
 [//]:*******
 
-Example A ~ 3 minutes 40 seconds 
+Example A ~ 3 minutes
 
-Example B ~ 3 minutes 50 seconds
+Example B ~ 5 minutes 50 seconds
 
 The runtime can be influenced by the size of the summary statistics files, the approach used for pruning (distance vs LD) but also by the number of simulations used for the sampling strategy to estimate the variance of the corrected causal effect and the covariance between observed and corrected effects (optimal number of simulations is automatically determined in the analysis).
 

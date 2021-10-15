@@ -191,11 +191,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.115 ( 0.0531 ) 
+    ##      corrected effect: 0.115 ( 0.0532 ) 
     ##      covariance between observed and corrected effect: 0.00212   
-    ##            9000 simulations were used to estimate the variance and the covariance.
+    ##            6000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  38  second(s).
+    ##  Runtime of the analysis:  3  minute(s) and  0  second(s).
     ```
 
 </details>
@@ -261,11 +261,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.204 ( 0.0257 ) 
-    ##      covariance between observed and corrected effect: 0.000582  
-    ##            11000 simulations were used to estimate the variance and the covariance.
+    ##      corrected effect: 0.204 ( 0.026 ) 
+    ##      covariance between observed and corrected effect: 0.000597  
+    ##            24000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  49  second(s).
+    ##  Runtime of the analysis:  5  minute(s) and  47  second(s).
     ```
 
 </details>
@@ -330,10 +330,10 @@ str(A)
     ##   ..$ m_IVs              : int 39
     ##   ..$ observed_effect_p  : num 0.0315
     ##   ..$ corrected_effect   : num 0.115
-    ##   ..$ corrected_effect_se: num 0.0531
-    ##   ..$ corrected_effect_p : num 0.031
-    ##   ..$ test_difference    : num -2.19
-    ##   ..$ p_difference       : num 0.0289
+    ##   ..$ corrected_effect_se: num 0.0532
+    ##   ..$ corrected_effect_p : num 0.0314
+    ##   ..$ test_difference    : num -2.21
+    ##   ..$ p_difference       : num 0.0268
     ##  $ LDSC               :List of 11
     ##   ..$ h2_exp           : num 0.244
     ##   ..$ h2_exp_se        : num 0.0107
@@ -358,9 +358,9 @@ unlist(A[["MRcorrection"]])
     ##     observed_effect  observed_effect_se               m_IVs   observed_effect_p 
     ##          0.08560606          0.03980045         39.00000000          0.03148552 
     ##    corrected_effect corrected_effect_se  corrected_effect_p     test_difference 
-    ##          0.11457158          0.05312187          0.03102371         -2.18506577 
+    ##          0.11457158          0.05323413          0.03138001         -2.21446516 
     ##        p_difference 
-    ##          0.02888402
+    ##          0.02679680
 
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
@@ -399,7 +399,7 @@ B[["MRcorrection"]]$corrected_effect
 B[["MRcorrection"]]$p_difference
 ```
 
-    ## [1] 4.00738e-07
+    ## [1] 2.611366e-172
 
 ``` r
 # in this case, we observed that the the observed effect estimate obtained using IVW 
@@ -415,9 +415,9 @@ unlist(B[["GeneticArchitecture"]])
 
 ## Runtime
 
-Example A \~ 3 minutes 40 seconds
+Example A \~ 3 minutes
 
-Example B \~ 3 minutes 50 seconds
+Example B \~ 5 minutes 50 seconds
 
 The runtime can be influenced by the size of the summary statistics
 files, the approach used for pruning (distance vs LD) but also by the
