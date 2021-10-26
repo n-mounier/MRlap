@@ -28,7 +28,7 @@ run_MR <- function(exposure_data,
   data <- dplyr::inner_join(exposure_data, outcome_data, by=c("rsid", "chr", "pos"), suffix=c(".exp", ".out"))
   # and we need to make sure alleles are aligned!
   data %>%
-    dplyr::mutate(std_beta.out = case_when(
+    dplyr::mutate(std_beta.out = dplyr::case_when(
       alt.exp == alt.out & ref.exp == ref.out ~ std_beta.out, # aligned
       ref.exp == alt.out & alt.exp == ref.out ~ -std_beta.out, # swapped
       TRUE ~ NA_real_ # otherwise exclude SNP

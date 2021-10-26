@@ -181,9 +181,9 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
                   p = 2*stats::pnorm(-abs(.data$Z))) -> GWASData_clean
   # remove HLA region (slice do not work well if there is this region is already excluded and no SNP are in the range)
   #  slice(-which(chr==6 & pos>=28.5e6 & pos<=33.5e6))
-  if(GWASData_clean %>% filter(chr==6 & pos>=28.5e6 & pos<=33.5e6) %>% nrow()>0){
+  if(GWASData_clean %>% dplyr::filter(.data$chr==6 & .data$pos>=28.5e6 & .data$pos<=33.5e6) %>% nrow()>0){
     GWASData_clean %>%
-      slice(-which(chr==6 & pos>=28.5e6 & pos<=33.5e6)) -> GWASData_clean
+      dplyr::slice(-which(.data$chr==6 & .data$pos>=28.5e6 & .data$pos<=33.5e6)) -> GWASData_clean
   }
 
   res=GWASData_clean

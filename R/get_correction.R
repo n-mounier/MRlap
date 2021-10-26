@@ -139,8 +139,8 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
 
     num_groups=10
     res %>%
-      dplyr::group_by((row_number()-1) %/% (n()/num_groups)) %>%
-      tidyr::nest() %>% pull(data) -> res_subsets
+      dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/num_groups)) %>%
+      tidyr::nest() %>% dplyr::pull(data) -> res_subsets
     subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
     subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 
@@ -153,8 +153,8 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     while(needmore){
       res = rbind(res,get_s(s))
       res %>%
-        dplyr::group_by((row_number()-1) %/% (n()/num_groups)) %>%
-        tidyr::nest() %>% pull(data) -> res_subsets
+        dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/num_groups)) %>%
+        tidyr::nest() %>% dplyr::pull(data) -> res_subsets
       subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
       subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 

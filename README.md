@@ -16,9 +16,11 @@ sticker(imgurl,
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->
 
 :information\_source: `MRlap` is still under active development.  
-:information\_source: `MRlap` has been updated to version 0.0.1. Note
+:information\_source: `MRlap` has been updated to version 0.0.2. Note
 that some features of this version (including the use of case-control
-data) are still being tested.  
+data) are still being tested and that in previous versions the exclusion
+of IVs more strong associated with the outcome than with the exposure
+was not correcltly performed.  
 Check the [NEWS](NEWS.md) to learn more about what has been modified!
 
 ## Overview
@@ -191,11 +193,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.115 ( 0.0532 ) 
-    ##      covariance between observed and corrected effect: 0.00212   
-    ##            6000 simulations were used to estimate the variance and the covariance.
+    ##      corrected effect: 0.115 ( 0.0527 ) 
+    ##      covariance between observed and corrected effect: 0.00208   
+    ##            10000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  0  second(s).
+    ##  Runtime of the analysis:  3  minute(s) and  45  second(s).
     ```
 
 </details>
@@ -261,11 +263,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.204 ( 0.026 ) 
-    ##      covariance between observed and corrected effect: 0.000597  
-    ##            24000 simulations were used to estimate the variance and the covariance.
+    ##      corrected effect: 0.204 ( 0.0257 ) 
+    ##      covariance between observed and corrected effect: 0.000583  
+    ##            7000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  5  minute(s) and  47  second(s).
+    ##  Runtime of the analysis:  3  minute(s) and  42  second(s).
     ```
 
 </details>
@@ -330,10 +332,10 @@ str(A)
     ##   ..$ m_IVs              : int 39
     ##   ..$ observed_effect_p  : num 0.0315
     ##   ..$ corrected_effect   : num 0.115
-    ##   ..$ corrected_effect_se: num 0.0532
-    ##   ..$ corrected_effect_p : num 0.0314
-    ##   ..$ test_difference    : num -2.21
-    ##   ..$ p_difference       : num 0.0268
+    ##   ..$ corrected_effect_se: num 0.0527
+    ##   ..$ corrected_effect_p : num 0.0297
+    ##   ..$ test_difference    : num -2.07
+    ##   ..$ p_difference       : num 0.0382
     ##  $ LDSC               :List of 11
     ##   ..$ h2_exp           : num 0.244
     ##   ..$ h2_exp_se        : num 0.0107
@@ -358,9 +360,9 @@ unlist(A[["MRcorrection"]])
     ##     observed_effect  observed_effect_se               m_IVs   observed_effect_p 
     ##          0.08560606          0.03980045         39.00000000          0.03148552 
     ##    corrected_effect corrected_effect_se  corrected_effect_p     test_difference 
-    ##          0.11457158          0.05323413          0.03138001         -2.21446516 
+    ##          0.11457158          0.05270960          0.02973234         -2.07272110 
     ##        p_difference 
-    ##          0.02679680
+    ##          0.03819824
 
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
@@ -415,9 +417,9 @@ unlist(B[["GeneticArchitecture"]])
 
 ## Runtime
 
-Example A \~ 3 minutes
+Example A \~ 3 minutes 45 seconds
 
-Example B \~ 5 minutes 50 seconds
+Example B \~ 3 minutes 45 seconds
 
 The runtime can be influenced by the size of the summary statistics
 files, the approach used for pruning (distance vs LD) but also by the

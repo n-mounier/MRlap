@@ -23,7 +23,7 @@ save(SmallOutcome_Data, file="~/Documents/SGG/Projects/MRlap/data/SmallOutcome_D
 
 
 ## Rdata for tests
-# last update, 2021/10/15
+# last update, 2021/10/26
 library(MRlap)
 
 # we use ~100K samples for BMI/SBP, with 0% of sample overlap
