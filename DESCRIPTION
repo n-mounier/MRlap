@@ -1,6 +1,6 @@
 Package: MRlap
 Title: MRlap is an R-package to perform two-sample Mendelian Randomisation (MR) analyses using (potentially) overlapping samples
-Version: 0.0.1.0000
+Version: 0.0.1.1
 Authors@R: 
     person(given = "Ninon",
            family = "Mounier",

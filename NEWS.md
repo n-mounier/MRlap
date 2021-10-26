@@ -1,3 +1,9 @@
+# MRlap 0.0.1.1 (2021-10-26)
+
+## Bug fixes
+- Excluding IVs more strongly associated with the outcome than with the exposure
+There was a typo leading to an underestimation of the t-statistics, and IVs more strongly associated with the outcome than with the exposure were not correctly identified.
+
 # MRlap 0.0.1.0 (2021-10-15)
 
 ## Changes
