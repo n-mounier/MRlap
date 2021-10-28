@@ -49,11 +49,12 @@ run_LDSC <- function(exposure_data,
 
   if(verbose) cat("> Running cross-trait LDSC... \n")
 
-  invisible(utils::capture.output(LDSCoutput <- GenomicSEM::ldsc(traits,
-                                                          sample.prev,
-                                                          population.prev,
-                                                          ld,
-                                                          trait.names)))
+  invisible(utils::capture.output(LDSCoutput <- GenomicSEM::ldsc(traits = traits,
+                                                          sample.prev = sample.prev,
+                                                          population.prev = population.prev,
+                                                          ld = ld,
+                                                          wld = ld,
+                                                          trait.names = trait.names)))
 
   if(verbose & save_logfiles) cat("  Please check the log file", paste0(c(traits, "ldsc.log"), collapse="_"),  "for detailed results of the cross-trait LDSC analysis\n")
   if(verbose & !save_logfiles) cat("  Please consider saving the log files and checking them to ensure that all columns were interpreted correctly and no warnings were issued for any of the summary statistics files\n")
