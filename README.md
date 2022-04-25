@@ -281,6 +281,7 @@ Show log
 “observed\_effect” : IVW-MR observed causal effect estimate,  
 “observed\_effect\_se” : IVW-MR observed causal effect standard error,  
 “m\_IVs” : number of IVs used,  
+“IVs” : rsid of IVs used,  
 “observed\_effect\_p” : IVW-MR observed causal effect p-value,  
 “corrected\_effect” : corrected causal effect estimate,  
 “corrected\_effect\_se” : corrected causal effect standard error,  
@@ -326,16 +327,17 @@ str(A)
 ```
 
     ## List of 3
-    ##  $ MRcorrection       :List of 9
+    ##  $ MRcorrection       :List of 10
     ##   ..$ observed_effect    : num 0.0856
     ##   ..$ observed_effect_se : num 0.0398
     ##   ..$ m_IVs              : int 39
+    ##   ..$ IVs                : chr [1:39] "rs684382" "rs2051086" "rs543874" "rs6728726" ...
     ##   ..$ observed_effect_p  : num 0.0315
     ##   ..$ corrected_effect   : num 0.115
-    ##   ..$ corrected_effect_se: num 0.0527
-    ##   ..$ corrected_effect_p : num 0.0297
-    ##   ..$ test_difference    : num -2.07
-    ##   ..$ p_difference       : num 0.0382
+    ##   ..$ corrected_effect_se: num 0.0535
+    ##   ..$ corrected_effect_p : num 0.0323
+    ##   ..$ test_difference    : num -2.35
+    ##   ..$ p_difference       : num 0.0189
     ##  $ LDSC               :List of 11
     ##   ..$ h2_exp           : num 0.244
     ##   ..$ h2_exp_se        : num 0.0107
@@ -357,12 +359,38 @@ str(A)
 unlist(A[["MRcorrection"]])
 ```
 
-    ##     observed_effect  observed_effect_se               m_IVs   observed_effect_p 
-    ##          0.08560606          0.03980045         39.00000000          0.03148552 
-    ##    corrected_effect corrected_effect_se  corrected_effect_p     test_difference 
-    ##          0.11457158          0.05270960          0.02973234         -2.07272110 
-    ##        p_difference 
-    ##          0.03819824
+    ##      observed_effect   observed_effect_se                m_IVs 
+    ## "0.0856060582715485" "0.0398004451909771"                 "39" 
+    ##                 IVs1                 IVs2                 IVs3 
+    ##           "rs684382"          "rs2051086"           "rs543874" 
+    ##                 IVs4                 IVs5                 IVs6 
+    ##          "rs6728726"           "rs713586"          "rs6731302" 
+    ##                 IVs7                 IVs8                 IVs9 
+    ##          "rs2861683"          "rs1567959"          "rs6792892" 
+    ##                IVs10                IVs11                IVs12 
+    ##          "rs1492014"          "rs1320903"         "rs13130484" 
+    ##                IVs13                IVs14                IVs15 
+    ##          "rs2307111"          "rs2410763"         "rs16867703" 
+    ##                IVs16                IVs17                IVs18 
+    ##          "rs2235569"         "rs12528998"         "rs12202969" 
+    ##                IVs19                IVs20                IVs21 
+    ##          "rs1167796"          "rs2245368"          "rs2299381" 
+    ##                IVs22                IVs23                IVs24 
+    ##          "rs2439823"           "rs900144"             "rs6265" 
+    ##                IVs25                IVs26                IVs27 
+    ##         "rs10838777"          "rs7132908"         "rs10146997" 
+    ##                IVs28                IVs29                IVs30 
+    ##         "rs16951304"         "rs10083738"          "rs4889606" 
+    ##                IVs31                IVs32                IVs33 
+    ##          "rs1421085"          "rs4783718"          "rs4239060" 
+    ##                IVs34                IVs35                IVs36 
+    ##          "rs1916295"         "rs11653498"           "rs571312" 
+    ##                IVs37                IVs38                IVs39 
+    ##         "rs11672660"          "rs3810291"           "rs400140" 
+    ##    observed_effect_p     corrected_effect  corrected_effect_se 
+    ## "0.0314855203412581"  "0.114571580921726" "0.0535168157373563" 
+    ##   corrected_effect_p      test_difference         p_difference 
+    ## "0.0322859766459089"  "-2.34838999741478"  "0.018854767642572"
 
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
@@ -401,7 +429,7 @@ B[["MRcorrection"]]$corrected_effect
 B[["MRcorrection"]]$p_difference
 ```
 
-    ## [1] 2.611366e-172
+    ## [1] 1.4104e-54
 
 ``` r
 # in this case, we observed that the the observed effect estimate obtained using IVW 
@@ -417,9 +445,9 @@ unlist(B[["GeneticArchitecture"]])
 
 ## Runtime
 
-Example A \~ 3 minutes 45 seconds
+Example A \~ 3 minutes 40 seconds
 
-Example B \~ 3 minutes 45 seconds
+Example B \~ 3 minutes 35 seconds
 
 The runtime can be influenced by the size of the summary statistics
 files, the approach used for pruning (distance vs LD) but also by the

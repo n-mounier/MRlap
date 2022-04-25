@@ -194,6 +194,7 @@ MRlap <- function(exposure,
                list("observed_effect" = alpha_obs,
                     "observed_effect_se" = alpha_obs_se,
                     "m_IVs" = nrow(IVs),
+                    "IVs" = IVs_rs,
                     "observed_effect_p" = 2*stats::pnorm(-abs(alpha_obs/alpha_obs_se)),
                     "corrected_effect" = alpha_corrected,
                     "corrected_effect_se" = alpha_corrected_se,
@@ -222,5 +223,6 @@ MRlap <- function(exposure,
   results = list(MRcorrection = results_MR,
                  LDSC = results_LDSC,
                  GeneticArchitecture = results_GeneticArchitecture)
+
   return(results)
 }

@@ -16,7 +16,7 @@ A = readRDS("inst/Data/A.RDS")
 B = readRDS("inst/Data/B.RDS")
 # # automatically updates manual
 devtools::build_manual()
-system("mv /Users/nmounier/Documents/SGG/Projects/MRlap_0.0.2.0000.pdf /Users/nmounier/Documents/SGG/Projects/MRlap/doc/MRlap-manual.pdf")
+system("mv /Users/nmounier/Documents/SGG/Projects/MRlap_0.0.2.0.pdf /Users/nmounier/Documents/SGG/Projects/MRlap/doc/MRlap-manual.pdf")
 #remove.packages("MRlap")
 library(MRlap)
 ```
@@ -265,6 +265,7 @@ B = MRlap(exposure = SmallExposure_Data,
 "observed_effect" : IVW-MR observed causal effect estimate,   
 "observed_effect_se" : IVW-MR observed causal effect standard error,  
 "m_IVs" : number of IVs used,    
+"IVs" : rsid of IVs used,     
 "observed_effect_p" : IVW-MR observed causal effect p-value,      
 "corrected_effect" : corrected causal effect estimate,      
 "corrected_effect_se" : corrected causal effect standard error,      
@@ -332,9 +333,9 @@ unlist(B[["GeneticArchitecture"]])
 ## Runtime
 [//]:*******
 
-Example A ~ 3 minutes 45 seconds
+Example A ~ 3 minutes 40 seconds
 
-Example B ~ 3 minutes 45 seconds
+Example B ~ 3 minutes 35 seconds
 
 The runtime can be influenced by the size of the summary statistics files, the approach used for pruning (distance vs LD) but also by the number of simulations used for the sampling strategy to estimate the variance of the corrected causal effect and the covariance between observed and corrected effects (optimal number of simulations is automatically determined in the analysis).
 
