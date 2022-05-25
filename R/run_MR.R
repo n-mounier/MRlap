@@ -22,6 +22,7 @@ run_MR <- function(exposure_data,
                    MR_pruning_dist = 500,
                    MR_pruning_LD = 0,
                    MR_reverse = NULL,
+                   polygenicity_threshold = 1e-5,
                    verbose = TRUE){
 
   # here we need to join exposure and outcome data
@@ -58,7 +59,6 @@ run_MR <- function(exposure_data,
 
   # if no IVs, stop()
   if(nrow(data_thresholded)==0) stop("no IV left after excluding IVs more strongly associated with the outcome than with the exposure")
-
 
   data_thresholded %>%
     dplyr::transmute(SNP = .data$rsid,
@@ -108,6 +108,45 @@ run_MR <- function(exposure_data,
   if(verbose) cat("   ", format(nrow(data_pruned), big.mark=","), "IVs left after pruning \n")
 
 
+
+  # to estimate the polygenicity
+  # pruning should be done using polygenicity_threshold
+  # and same pruning parameters
+
+  data %>%
+    dplyr::filter(.data$p.exp<polygenicity_threshold) -> data_thresholded_polygenicity
+
+  # here remove the ones with
+  if(!is.null(MR_reverse)){
+    reverse_t_threshold  =  stats::qnorm(MR_reverse)
+    data_thresholded_polygenicity %>%
+      dplyr::filter( ( abs(.data$std_beta.exp) - abs(.data$std_beta.out)) /
+                       sqrt(.data$std_SE.exp^2 + .data$std_SE.out^2) > reverse_t_threshold) -> data_thresholded_filtered
+    data_thresholded_polygenicity = data_thresholded_filtered
+    rm(data_thresholded_filtered)
+  }
+
+  data_thresholded_polygenicity %>%
+    dplyr::transmute(SNP = .data$rsid,
+                     chr_name = .data$chr,
+                     chr_start = .data$pos,
+                     pval.exposure = .data$p.exp) -> ToPrune_polygenicity
+
+  if(MR_pruning_LD>0){# LD-pruning
+    # Do pruning, chr by chr
+    SNPsToKeep_polygenicity = c()
+    for(chr in unique(ToPrune$chr_name)){
+      SNPsToKeep_polygenicity = c(SNPsToKeep_polygenicity, suppressMessages(TwoSampleMR::clump_data(ToPrune_polygenicity[ToPrune_polygenicity$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
+    }
+  } else{# distance pruning
+    SNPsToKeep_polygenicity = prune_byDistance(ToPrune_polygenicity, prune.dist=MR_pruning_dist, byP=T)
+  }
+  data_thresholded_polygenicity %>%
+    dplyr::filter(.data$rsid %in% SNPsToKeep_polygenicity) -> data_pruned_polygenicity
+
+
+
+
   ## check, if IVs < 2, fail?
 
 
@@ -122,7 +161,7 @@ run_MR <- function(exposure_data,
               "alpha_obs_se" = res_MR_TwoSampleMR$se,
               "n_exp" = mean(data_pruned$N.exp),
               "n_out" = mean(data_pruned$N.out),
-              "IVs" = data_pruned %>% dplyr::select(.data$std_beta.exp, .data$std_SE.exp),
+              "IVs_polygenicity" = data_pruned_polygenicity %>% dplyr::select(.data$std_beta.exp, .data$std_SE.exp),
               "IVs_rs" = data_pruned$rsid))
 
 }

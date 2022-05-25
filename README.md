@@ -145,6 +145,8 @@ parameters to indicate the correct paths.
 BMI <- system.file("data/", "BMI_Data.tsv.gz", package="MRlap")
 SBP <- system.file("data/", "SBP_Data.tsv.gz", package="MRlap")
 
+# -> update with default polygenicity threshold
+
 # MR instruments will be selected using default parameter (5e-8) and distance-pruned (500Kb),
 # No file will be saved.
 A = MRlap(exposure = BMI,
@@ -211,6 +213,8 @@ Show log
 # function works even the overlap is unkown (overlap is *not* a parameter of the function) 
 # as it uses cross-trait LDSC to approximate it
 # (~750,000 SNPs - stored as data.frames)
+
+# -> update with default polygenicity threshold
 
 # MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=0.05),
 # No file will be saved.

@@ -15,6 +15,9 @@
 #'        Expects LD scores formated as required by the original LD score regression software.  (character)
 #' @param hm3 The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
 #'        (character)
+#' @param LDSC_results LDSC results from a previous \code{MRlap} analysis (using the same exposure and outcome),
+#'        should be used with care - if \code{LDSC_results} is provided, LD score regression will not be performed and
+#'        and \code{ld} and \code{hm3} are not required (numeric list, \code{MRlap_obj})
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=5e-8} (numeric)
 #' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 50000,
@@ -23,6 +26,9 @@
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param MR_reverse The p-value used to exclude MR instruments that are more strongly associated with the outcome
 #'        than with the exposure,\code{default=1e-3} (numeric)
+#' @param polygenicity_threshold The threshold used to select SNPs when estimating the polygenicity, should not
+#'        be too stringent,should not be more stringent than MR_threshold, should be lower than 1e-3,
+#'        \code{default=1e-5} (numeric)
 # #' @param s The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
 # #'        effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)
 #' @param save_logfiles  A logical indicating if log files from LDSC should be saved,
@@ -53,12 +59,14 @@ MRlap <- function(exposure,
                   exposure_name = NULL,
                   outcome,
                   outcome_name = NULL,
-                  ld,
-                  hm3,
+                  ld = NULL,
+                  hm3 = NULL,
+                  LDSC_results = NULL,
                   MR_threshold = 5e-8,
                   MR_pruning_dist = 500,
                   MR_pruning_LD = 0,
                   MR_reverse = 1e-3,
+                  polygenicity_threshold = 1e-5,
                   #s=10000,
                   save_logfiles = FALSE,
                   verbose = TRUE) {
@@ -91,18 +99,25 @@ MRlap <- function(exposure,
     attributes(outcome)$GName =  deparse(substitute(outcome)) # get the "name" of the object used as an argument in the function
   }
 
-
+  if(!is.null(LDSC_results)){
+    expected_names = c("h2_exp", "h2_exp_se", "int_exp", "h2_out",
+                       "h2_out_se", "int_out", "gcov", "gcov_se",
+                       "rg", "int_crosstrait", "int_crosstrait_se")
+    if(!all(names(LDSC_results) == expected_names)) stop("LDSC_results : wrong format", call. = FALSE)
+    names(LDSC_results)[c(1,2,7,8,10,11)] = c("h2_LDSC", "h2_LDSC_se", "rgcov", "rgcov_se", "lambda", "lambda_se")
+  } else {
   ## ld_wd + hm3
-  if (is.character(ld)){
-    if(!dir.exists(ld)) stop("ld : the folder does not exist", call. = FALSE)
-    # get absolute path
-    ld = normalizePath(ld)
-  } else stop("ld : wrong format, should be character", call. = FALSE)
-  if (is.character(hm3)){
-    if(!file.exists(hm3)) stop("hm3 : the file does not exist", call. = FALSE)
-    # get absolute path
-    hm3 = normalizePath(hm3)
-  } else stop("hm3 : wrong format, should be character", call. = FALSE)
+    if (is.character(ld)){
+      if(!dir.exists(ld)) stop("ld : the folder does not exist", call. = FALSE)
+      # get absolute path
+      ld = normalizePath(ld)
+    } else stop("ld : wrong format, should be character", call. = FALSE)
+    if (is.character(hm3)){
+      if(!file.exists(hm3)) stop("hm3 : the file does not exist", call. = FALSE)
+      # get absolute path
+      hm3 = normalizePath(hm3)
+    } else stop("hm3 : wrong format, should be character", call. = FALSE)
+  }
 
 
   ## MR_threshold -> should not be larger than 10-5, can only be more stringent
@@ -130,6 +145,15 @@ MRlap <- function(exposure,
     if(verbose) cat("Distance-based pruning will be used for MR instruments \n")
   }
 
+  ## polygenicity_threshold -> should not be more stringent than MR_threshold
+  #                         -> can only be more stringent than 1e-3
+  if(!is.numeric(polygenicity_threshold)) stop("polygenicity_threshold : non-numeric argument", call. = FALSE)
+  if(polygenicity_threshold>10^-3) stop("polygenicity_threshold : superior to the threshold limit (1e-3)", call. = FALSE)
+  if(polygenicity_threshold<MR_threshold) stop("polygenicity_threshold : more stringent than MR_threshold", call. = FALSE)
+
+  if(verbose) cat("The p-value threshold used to estimate the exposure polygenicity is:", format(polygenicity_threshold, scientific = T), "\n")
+
+
   # 0 : Tidy input GWAS
   if(!is.null(exposure_name) & !is.character(exposure_name)) stop("exposure_name : non-character argument", call. = FALSE)
   if(!is.null(outcome_name) & !is.character(outcome_name)) stop("outcome_name : non-character argument", call. = FALSE)
@@ -144,27 +168,32 @@ MRlap <- function(exposure,
 
 
   ### 1 : run cross-trait LDSC ###
-  if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
-  if(verbose) cat("<<< Performing cross-trait LDSC >>>  \n")
-  # returns h2 exposure - SE h2 exposure - cross-trait intercept - SE cross-trait intercept
-  LDSC_results = run_LDSC(exposure_data, exposure_name,
-                          outcome_data, outcome_name, ld, hm3, save_logfiles, verbose)
-  # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
-  #     int_exp, int_out,  h2_out, h2_out_se, rgcov, rgcov_se, rg
+  if(is.null(LDSC_results)){
+    if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+    if(verbose) cat("<<< Performing cross-trait LDSC >>>  \n")
+    # returns h2 exposure - SE h2 exposure - cross-trait intercept - SE cross-trait intercept
+    LDSC_results = run_LDSC(exposure_data, exposure_name,
+                            outcome_data, outcome_name, ld, hm3, save_logfiles, verbose)
+    # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
+    #     int_exp, int_out,  h2_out, h2_out_se, rgcov, rgcov_se, rg
+  } else {
+    if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
+    if(verbose) cat("<<< Using cross-trait LDSC provided as input >>>  \n")
+  }
 
   # 2 : run IVW-MR
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Running IVW-MR >>>  \n")
   # returns alpha - SE alpha - instruments (needed for corrected effect SE)
   MR_results = run_MR(exposure_data, outcome_data, MR_threshold,
-                      MR_pruning_dist, MR_pruning_LD, MR_reverse,
+                      MR_pruning_dist, MR_pruning_LD, MR_reverse, polygenicity_threshold,
                       verbose)
-  # -> alpha_obs, alpha_obs_se, n_exp, n_out, IVs
+  # -> alpha_obs, alpha_obs_se, n_exp, n_out, IVs_polygenicity, IVs_rs
   # 3 : get corrected effect
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Estimating corrected effect >>>  \n")
   correction_results = with(c(MR_results, LDSC_results),
-    get_correction(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
+    get_correction(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, polygenicity_threshold,
                                       alpha_obs, alpha_obs_se,
                                       n_exp, n_out, MR_threshold, verbose))
   # -> alpha_corrected, alpha_corrected_se, cov_obs_corrected, test_diff, p_diff
@@ -173,11 +202,11 @@ MRlap <- function(exposure,
 
   tmp = "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><>\n"
 
-  if(is.na(correction_results$alpha_corrected_se)){
-    if(verbose) cat("WARNING: the sampling strategy failed in the estimation of the standard error.\n")
-    if(verbose) cat("Please try to increase the number of simulations s. \n")
-
-  }
+  # if(is.na(correction_results$alpha_corrected_se)){
+  #   if(verbose) cat("WARNING: the sampling strategy failed in the estimation of the standard error.\n")
+  #   if(verbose) cat("Please try to increase the number of simulations s. \n")
+  #
+  # }
 
   ### we're done! ###
   Time = as.integer((proc.time()-StartTime)[3])
@@ -193,7 +222,7 @@ MRlap <- function(exposure,
   results_MR=with(c(MR_results, correction_results),
                list("observed_effect" = alpha_obs,
                     "observed_effect_se" = alpha_obs_se,
-                    "m_IVs" = nrow(IVs),
+                    "m_IVs" = length(IVs_rs),
                     "IVs" = IVs_rs,
                     "observed_effect_p" = 2*stats::pnorm(-abs(alpha_obs/alpha_obs_se)),
                     "corrected_effect" = alpha_corrected,

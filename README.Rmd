@@ -130,7 +130,6 @@ A = MRlap(exposure = BMI,
           outcome_name = "SBP_100Ksample",
           ld = "~/eur_w_ld_chr",
           hm3 = "~/w_hm3.noMHC.snplist")
-
 ``` 
 
 <details>
