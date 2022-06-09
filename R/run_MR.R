@@ -144,6 +144,7 @@ run_MR <- function(exposure_data,
   data_thresholded_polygenicity %>%
     dplyr::filter(.data$rsid %in% SNPsToKeep_polygenicity) -> data_pruned_polygenicity
 
+  if(verbose) cat("   ", format(nrow(data_pruned_polygenicity), big.mark=","), "IVs will be used to estimate polygenicity \n")
 
 
 
@@ -155,7 +156,7 @@ run_MR <- function(exposure_data,
   TwoSampleMR::mr_ivw(data_pruned$std_beta.exp, data_pruned$std_beta.out,
                       data_pruned$std_SE.exp, data_pruned$std_SE.out) -> res_MR_TwoSampleMR
 
-  if(verbose) cat("   ",  "IVW-MR observed effect:", format(res_MR_TwoSampleMR$b, digits = 3), "(", format(res_MR_TwoSampleMR$se, digits=3), ")\n")
+  #if(verbose) cat("   ",  "IVW-MR observed effect:", format(res_MR_TwoSampleMR$b, digits = 3), "(", format(res_MR_TwoSampleMR$se, digits=3), ")\n")
 
   return(list("alpha_obs" = res_MR_TwoSampleMR$b,
               "alpha_obs_se" = res_MR_TwoSampleMR$se,

@@ -27,25 +27,27 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
 
   M=1150000 # consider M is a constant! number of independent markers genome-wide
   Tr = -stats::qnorm(MR_threshold/2)
+  Tr_polygenicity = -stats::qnorm(polygenicity_threshold/2)
+
   lambdaPrime = lambda/sqrt(n_exp*n_out)
 
   if(verbose) cat("> Estimating genetic architecture parameters... \n")
 
   # function for optimisation
-  get_pi <- function(my_pi, sumbeta2, Tr, n_exp, h2_LDSC, M){
+  get_pi <- function(my_pi, sumbeta2, Tr_polygenicity, n_exp, h2_LDSC, M){
     if(0>=my_pi) return(1e6)
 
     sigma = sqrt(h2_LDSC/(my_pi*M))
 
-    denominator = (my_pi * (2*(sigma^2 + 1/n_exp) * stats::pnorm( - Tr / sqrt( 1 + n_exp * sigma^2) ) +
-                              2 * Tr *(n_exp * sigma^4 + 2*sigma^2 + 1/n_exp) *exp(-Tr^2 / (2*(n_exp*sigma^2+1)))/( sqrt(2*pi) * ( 1 + n_exp *sigma^2)^(3/2))) +
-                     (1-my_pi)*1/n_exp * (2*stats::pnorm(-Tr) + 2*Tr *stats::dnorm(Tr))) * M
+    denominator = (my_pi * (2*(sigma^2 + 1/n_exp) * stats::pnorm( - Tr_polygenicity / sqrt( 1 + n_exp * sigma^2) ) +
+                              2 * Tr_polygenicity *(n_exp * sigma^4 + 2*sigma^2 + 1/n_exp) *exp(-Tr_polygenicity^2 / (2*(n_exp*sigma^2+1)))/( sqrt(2*pi) * ( 1 + n_exp *sigma^2)^(3/2))) +
+                     (1-my_pi)*1/n_exp * (2*stats::pnorm(-Tr_polygenicity) + 2*Tr_polygenicity *stats::dnorm(Tr_polygenicity))) * M
 
     return(abs(denominator-sumbeta2))
   }
 
   # get genetic architecture
-  get_geneticArchitecture<- function(theta, Nexp, M, Tr){
+  get_geneticArchitecture<- function(theta, Nexp, M, Tr_polygenicity){
     # theta is (effects, h2_LDSC)
     h2_LDSC = theta[length(theta)]
     effects = theta[-length(theta)]
@@ -59,7 +61,7 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
     for(i in 1:nSP){
       theta = 3 * 10^(stats::runif(1, -7, -2))
       res_optim = stats::optimise(get_pi, interval=c(1e-8, 0.3),
-                                  sumbeta2=sumBeta2, Tr=Tr, n_exp=n_exp, h2_LDSC=h2_LDSC, M=M, tol = 1e-6)
+                                  sumbeta2=sumBeta2, Tr_polygenicity=Tr_polygenicity, n_exp=n_exp, h2_LDSC=h2_LDSC, M=M, tol = 1e-6)
 
       Res_SP[i, 2:4] = c(theta, res_optim$objective, res_optim$minimum)
     }
@@ -72,7 +74,7 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
     return(c(as.numeric(pi_x), as.numeric(sigma)))
   }
   theta = c(IVs_polygenicity$std_beta.exp,h2_LDSC)
-  res_genA = get_geneticArchitecture(theta, n_exp, M, Tr)
+  res_genA = get_geneticArchitecture(theta, n_exp, M, Tr_polygenicity)
 
   get_alpha <- function(n_exp, lambdaPrime, pi_x, sigma, alpha_obs, Tr){
 
