@@ -101,7 +101,7 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
 
 
   ## get SE and covariance
-  get_correctedSE <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s=1000, sthreshold=0.05, extracheck=T){
+  get_correctedSE <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr_polygenicity, s=1000, sthreshold=0.05, extracheck=T){
 
     get_s <- function(s){
       effects = IVs_polygenicity$std_beta.exp
@@ -119,7 +119,7 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
       # effects + h2 are needed to get pi and therefore sigma
       D = rbind(E, H)
 
-      pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr))
+      pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr_polygenicity))
 
       # simulate 500 alpha_obs
       B =  matrix(stats::rnorm(s, alpha_obs, alpha_obs_se), ncol= s)
@@ -172,7 +172,7 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
   }
 
   # get SE corrected effects + COV
-  se_cov = get_correctedSE(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr)
+  se_cov = get_correctedSE(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr_polygenicity)
 
   if(verbose) cat("   ",  "corrected effect:", format(alpha_corrected, digits = 3), "(", format(se_cov[1], digits=3), ")\n")
   if(verbose) cat("   ",  "covariance between observed and corrected effect:", format(se_cov[2], digits=3), "\n")
