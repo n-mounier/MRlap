@@ -22,32 +22,30 @@
 # #' # @export
 # NOT EXPORTED
 
-get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, polygenicity_threshold,
+get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
                            alpha_obs, alpha_obs_se, n_exp, n_out, MR_threshold, verbose){
 
   M=1150000 # consider M is a constant! number of independent markers genome-wide
   Tr = -stats::qnorm(MR_threshold/2)
-  Tr_polygenicity = -stats::qnorm(polygenicity_threshold/2)
-
   lambdaPrime = lambda/sqrt(n_exp*n_out)
 
   if(verbose) cat("> Estimating genetic architecture parameters... \n")
 
   # function for optimisation
-  get_pi <- function(my_pi, sumbeta2, Tr_polygenicity, n_exp, h2_LDSC, M){
+  get_pi <- function(my_pi, sumbeta2, Tr, n_exp, h2_LDSC, M){
     if(0>=my_pi) return(1e6)
 
     sigma = sqrt(h2_LDSC/(my_pi*M))
 
-    denominator = (my_pi * (2*(sigma^2 + 1/n_exp) * stats::pnorm( - Tr_polygenicity / sqrt( 1 + n_exp * sigma^2) ) +
-                              2 * Tr_polygenicity *(n_exp * sigma^4 + 2*sigma^2 + 1/n_exp) *exp(-Tr_polygenicity^2 / (2*(n_exp*sigma^2+1)))/( sqrt(2*pi) * ( 1 + n_exp *sigma^2)^(3/2))) +
-                     (1-my_pi)*1/n_exp * (2*stats::pnorm(-Tr_polygenicity) + 2*Tr_polygenicity *stats::dnorm(Tr_polygenicity))) * M
+    denominator = (my_pi * (2*(sigma^2 + 1/n_exp) * stats::pnorm( - Tr / sqrt( 1 + n_exp * sigma^2) ) +
+                              2 * Tr *(n_exp * sigma^4 + 2*sigma^2 + 1/n_exp) *exp(-Tr^2 / (2*(n_exp*sigma^2+1)))/( sqrt(2*pi) * ( 1 + n_exp *sigma^2)^(3/2))) +
+                     (1-my_pi)*1/n_exp * (2*stats::pnorm(-Tr) + 2*Tr *stats::dnorm(Tr))) * M
 
     return(abs(denominator-sumbeta2))
   }
 
   # get genetic architecture
-  get_geneticArchitecture<- function(theta, Nexp, M, Tr_polygenicity){
+  get_geneticArchitecture<- function(theta, Nexp, M, Tr){
     # theta is (effects, h2_LDSC)
     h2_LDSC = theta[length(theta)]
     effects = theta[-length(theta)]
@@ -59,9 +57,9 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
                         pi = NA_real_)
 
     for(i in 1:nSP){
-      theta = 3 * 10^(stats::runif(1, -7, -2))
-      res_optim = stats::optimise(get_pi, interval=c(1e-8, 0.3),
-                                  sumbeta2=sumBeta2, Tr_polygenicity=Tr_polygenicity, n_exp=n_exp, h2_LDSC=h2_LDSC, M=M, tol = 1e-6)
+      theta = 3 * 10^(stats::runif(1, -7, -1))
+      res_optim = stats::optimise(get_pi, interval=c(1e-7, 0.3),
+                                  sumbeta2=sumBeta2, Tr=Tr, n_exp=n_exp, h2_LDSC=h2_LDSC, M=M, tol = 1e-6)
 
       Res_SP[i, 2:4] = c(theta, res_optim$objective, res_optim$minimum)
     }
@@ -73,8 +71,8 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
 
     return(c(as.numeric(pi_x), as.numeric(sigma)))
   }
-  theta = c(IVs_polygenicity$std_beta.exp,h2_LDSC)
-  res_genA = get_geneticArchitecture(theta, n_exp, M, Tr_polygenicity)
+  theta = c(IVs$std_beta.exp,h2_LDSC)
+  res_genA = get_geneticArchitecture(theta, n_exp, M, Tr)
 
   get_alpha <- function(n_exp, lambdaPrime, pi_x, sigma, alpha_obs, Tr){
 
@@ -101,17 +99,17 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
 
 
   ## get SE and covariance
-  get_correctedSE <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr_polygenicity, s=1000, sthreshold=0.05, extracheck=T){
+  get_correctedSE <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr, s=1000, sthreshold=0.05, extracheck=T){
 
     get_s <- function(s){
-      effects = IVs_polygenicity$std_beta.exp
-      effects_se = IVs_polygenicity$std_SE.exp
+      effects = IVs$std_beta.exp
+      effects_se = IVs$std_SE.exp
 
       # simulate 500 lambda
       L = matrix(stats::rnorm(s, lambda, lambda_se), ncol=s)/sqrt(n_exp*n_out)
 
       # simulate 500 "instruments sets" - each column = 1 simulation
-      E =  matrix(stats::rnorm(nrow(IVs_polygenicity)*s, effects, effects_se), ncol= s)
+      E =  matrix(stats::rnorm(nrow(IVs)*s, effects, effects_se), ncol= s)
 
       # simulate 500 h2_LDSC
       H = matrix(stats::rnorm(s, h2_LDSC, h2_LDSC_se), ncol=s)
@@ -119,7 +117,7 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
       # effects + h2 are needed to get pi and therefore sigma
       D = rbind(E, H)
 
-      pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr_polygenicity))
+      pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr))
 
       # simulate 500 alpha_obs
       B =  matrix(stats::rnorm(s, alpha_obs, alpha_obs_se), ncol= s)
@@ -143,36 +141,36 @@ get_correction <- function(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC
     res %>%
       dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/num_groups)) %>%
       tidyr::nest() %>% dplyr::pull(data) -> res_subsets
-    subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected, na.rm = T)))
-    subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha, use = "complete.obs")))
+    subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
+    subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 
     # check coeffificent(s) of variation
     needmore = F
     if(stats::sd(subsets_var) / base::mean(subsets_var) > sthreshold) needmore=T
     if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
-    if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected, na.rm = T)^2 - 2* stats::cov(res$alpha, res$corrected, use="complete.obs"))<0) needmore=T
+    if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
 
     while(needmore){
       res = rbind(res,get_s(s))
       res %>%
         dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/num_groups)) %>%
         tidyr::nest() %>% dplyr::pull(data) -> res_subsets
-      subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected, na.rm = T)))
-      subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha, use = "complete.obs")))
+      subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
+      subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
 
       needmore = F
       if(stats::sd(subsets_var) / base::mean(subsets_var) > sthreshold) needmore=T
       if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
-      if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected, na.rm = T)^2 - 2* stats::cov(res$alpha, res$corrected, use="complete.obs"))<0) needmore=T
+      if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
     }
 
-    all_res = c(stats::sd(res$corrected, na.rm = T), stats::cov(res$alpha, res$corrected, use="complete.obs"), nrow(res))
+    all_res = c(stats::sd(res$corrected), stats::cov(res$alpha, res$corrected), nrow(res))
     # normally, remove all temp and return just "res"
     return(all_res)
   }
 
   # get SE corrected effects + COV
-  se_cov = get_correctedSE(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr_polygenicity)
+  se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr)
 
   if(verbose) cat("   ",  "corrected effect:", format(alpha_corrected, digits = 3), "(", format(se_cov[1], digits=3), ")\n")
   if(verbose) cat("   ",  "covariance between observed and corrected effect:", format(se_cov[2], digits=3), "\n")

@@ -36,6 +36,7 @@ sticker(imgurl,
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->    
 
 :information\_source: `MRlap` is still under active development.    
+:information\_source: This branch aim at performing serial analyses for the same pair of traits, re-using LDSC results from previous analysis (`LDSC_results`) to speed up analyses. This should be used with care.        
 :information\_source: `MRlap` has been updated to version 0.0.2. Note that some features of this version (including the use of case-control data) are still being tested and that in previous versions the exclusion of IVs more strong associated with the outcome than with the exposure was not correcltly performed.           
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
 

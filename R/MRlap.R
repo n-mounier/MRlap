@@ -26,11 +26,6 @@
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param MR_reverse The p-value used to exclude MR instruments that are more strongly associated with the outcome
 #'        than with the exposure,\code{default=1e-3} (numeric)
-#' @param polygenicity_threshold The threshold used to select SNPs when estimating the polygenicity, should not
-#'        be too stringent,should not be more stringent than MR_threshold, should be lower than 1e-3,
-#'        \code{default=1e-5} (numeric)
-# #' @param s The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
-# #'        effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)
 #' @param save_logfiles  A logical indicating if log files from LDSC should be saved,
 #'        \code{default=FALSE}
 #' @param verbose  A logical indicating if information on progress should be reported,
@@ -66,8 +61,6 @@ MRlap <- function(exposure,
                   MR_pruning_dist = 500,
                   MR_pruning_LD = 0,
                   MR_reverse = 1e-3,
-                  polygenicity_threshold = 1e-5,
-                  #s=10000,
                   save_logfiles = FALSE,
                   verbose = TRUE) {
 
@@ -145,14 +138,6 @@ MRlap <- function(exposure,
     if(verbose) cat("Distance-based pruning will be used for MR instruments \n")
   }
 
-  ## polygenicity_threshold -> should not be more stringent than MR_threshold
-  #                         -> can only be more stringent than 1e-3
-  if(!is.numeric(polygenicity_threshold)) stop("polygenicity_threshold : non-numeric argument", call. = FALSE)
-  if(polygenicity_threshold>10^-3) stop("polygenicity_threshold : superior to the threshold limit (1e-3)", call. = FALSE)
-  if(polygenicity_threshold<MR_threshold) stop("polygenicity_threshold : more stringent than MR_threshold", call. = FALSE)
-
-  if(verbose) cat("The p-value threshold used to estimate the exposure polygenicity is:", format(polygenicity_threshold, scientific = T), "\n")
-
 
   # 0 : Tidy input GWAS
   if(!is.null(exposure_name) & !is.character(exposure_name)) stop("exposure_name : non-character argument", call. = FALSE)
@@ -186,16 +171,16 @@ MRlap <- function(exposure,
   if(verbose) cat("<<< Running IVW-MR >>>  \n")
   # returns alpha - SE alpha - instruments (needed for corrected effect SE)
   MR_results = run_MR(exposure_data, outcome_data, MR_threshold,
-                      MR_pruning_dist, MR_pruning_LD, MR_reverse, polygenicity_threshold,
+                      MR_pruning_dist, MR_pruning_LD, MR_reverse,
                       verbose)
-  # -> alpha_obs, alpha_obs_se, n_exp, n_out, IVs_polygenicity, IVs_rs
+  # -> alpha_obs, alpha_obs_se, n_exp, n_out, IVs_rs
   # 3 : get corrected effect
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Estimating corrected effect >>>  \n")
   correction_results = with(c(MR_results, LDSC_results),
-    get_correction(IVs_polygenicity, lambda, lambda_se, h2_LDSC, h2_LDSC_se, polygenicity_threshold,
-                                      alpha_obs, alpha_obs_se,
-                                      n_exp, n_out, MR_threshold, verbose))
+                            get_correction(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
+                                           alpha_obs, alpha_obs_se,
+                                           n_exp, n_out, MR_threshold, verbose))
   # -> alpha_corrected, alpha_corrected_se, cov_obs_corrected, test_diff, p_diff
   #    pi_x, sigma2_x
 

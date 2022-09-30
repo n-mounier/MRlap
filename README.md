@@ -16,6 +16,9 @@ sticker(imgurl,
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->
 
 :information\_source: `MRlap` is still under active development.  
+:information\_source: This branch aim at performing serial analyses for
+the same pair of traits, re-using LDSC results from previous analysis
+(`LDSC_results`) to speed up analyses. This should be used with care.  
 :information\_source: `MRlap` has been updated to version 0.0.2. Note
 that some features of this version (including the use of case-control
 data) are still being tested and that in previous versions the exclusion
@@ -145,8 +148,6 @@ parameters to indicate the correct paths.
 BMI <- system.file("data/", "BMI_Data.tsv.gz", package="MRlap")
 SBP <- system.file("data/", "SBP_Data.tsv.gz", package="MRlap")
 
-# -> update with default polygenicity threshold
-
 # MR instruments will be selected using default parameter (5e-8) and distance-pruned (500Kb),
 # No file will be saved.
 A = MRlap(exposure = BMI,
@@ -213,8 +214,6 @@ Show log
 # function works even the overlap is unkown (overlap is *not* a parameter of the function) 
 # as it uses cross-trait LDSC to approximate it
 # (~750,000 SNPs - stored as data.frames)
-
-# -> update with default polygenicity threshold
 
 # MR instruments will be selected using a more stringent threshold (5e-10) and LD-pruned (500Kb - r2=0.05),
 # No file will be saved.
