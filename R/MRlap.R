@@ -18,8 +18,7 @@
 #' @param LDSC_results LDSC results from a previous \code{MRlap} analysis (using the same exposure and outcome),
 #'        should be used with care - if \code{LDSC_results} is provided, LD score regression will not be performed and
 #'        and \code{ld} and \code{hm3} are not required (numeric list, \code{MRlap_obj})
-#' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
-#'        than 1e-5, \code{default=5e-8} (numeric)
+#' @param MR_threshold The threshold used to select strong instruments for MR, \code{default=5e-8} (numeric)
 #' @param MR_pruning_dist The distance used for pruning MR instruments (in Kb), should be between 10 and 50000,
 #'        \code{default=500} (numeric)
 #' @param MR_pruning_LD The LD threshold (r2) used for pruning MR instruments, should be between 0 and 1
@@ -115,7 +114,7 @@ MRlap <- function(exposure,
 
   ## MR_threshold -> should not be larger than 10-5, can only be more stringent
   if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
-  if(MR_threshold>10^-5) stop("MR_threshold : superior to the threshold limit", call. = FALSE)
+  #if(MR_threshold>10^-5) stop("MR_threshold : superior to the threshold limit", call. = FALSE)
 
   if(verbose) cat("The p-value threshold used for selecting MR instruments is:", format(MR_threshold, scientific = T), "\n")
 
