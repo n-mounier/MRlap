@@ -72,7 +72,7 @@ You can install the current version of `MRlap` with:
 ``` r
 # Directly install the package from github
 # install.packages("remotes")
-remotes::install_github("n-mounier/MRlap", )
+remotes::install_github("n-mounier/MRlap")
 library(MRlap)
 ```
 
