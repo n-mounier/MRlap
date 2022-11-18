@@ -148,7 +148,7 @@ tidy_inputGWAS <- function(GWAS, verbose=FALSE){
 
 
   GWASData %>%
-    dplyr::select(dplyr::all_of(colNumbers)) %>%
+    dplyr::select(tidyselect::all_of(colNumbers)) %>%
     stats::setNames(colNames) -> GWASData_clean
 
 

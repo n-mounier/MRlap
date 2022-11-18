@@ -15,6 +15,7 @@ Imports:
     magrittr,
     tibble,
     dplyr,
+    tidyselect,
     data.table,
     rlang,
     stringr,
