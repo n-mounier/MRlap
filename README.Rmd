@@ -36,7 +36,7 @@ sticker(imgurl,
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->    
 
 :information\_source: `MRlap` is still under active development.    
-:information\_source: `MRlap` has been updated to version 0.0.2. Note that some features of this version (including the use of case-control data) are still being tested and that in previous versions the exclusion of IVs more strong associated with the outcome than with the exposure was not correcltly performed.           
+:information\_source: `MRlap` has been updated to version 0.0.3. Note that in previous versions the exclusion of IVs more strong associated with the outcome than with the exposure was not correcltly performed.           
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
 
 ## Overview
