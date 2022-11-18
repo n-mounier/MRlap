@@ -191,11 +191,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.115 ( 0.0536 ) 
-    ##      covariance between observed and corrected effect: 0.00215   
-    ##            10000 simulations were used to estimate the variance and the covariance.
+    ##      corrected effect: 0.115 ( 0.0535 ) 
+    ##      covariance between observed and corrected effect: 0.002154   
+    ##            5000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  11  second(s).
+    ##  Runtime of the analysis:  3  minute(s) and  1  second(s).
     ```
 
 </details>
@@ -261,11 +261,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.199 ( 0.0265 ) 
+    ##      corrected effect: 0.199 ( 0.0266 ) 
     ##      covariance between observed and corrected effect: 0.000625  
-    ##            7000 simulations were used to estimate the variance and the covariance.
+    ##            10000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  09  second(s).
+    ##  Runtime of the analysis:  3  minute(s) and  47  second(s).
     ```
 
 </details>
@@ -332,10 +332,10 @@ str(A)
     ##   ..$ IVs                : chr [1:39] "rs684382" "rs2051086" "rs543874" "rs6728726" ...
     ##   ..$ observed_effect_p  : num 0.0315
     ##   ..$ corrected_effect   : num 0.115
-    ##   ..$ corrected_effect_se: num 0.0536
-    ##   ..$ corrected_effect_p : num 0.0324
-    ##   ..$ test_difference    : num -2.36
-    ##   ..$ p_difference       : num 0.0185
+    ##   ..$ corrected_effect_se: num 0.0535
+    ##   ..$ corrected_effect_p : num 0.0321
+    ##   ..$ test_difference    : num -2.34
+    ##   ..$ p_difference       : num 0.0192
     ##  $ LDSC               :List of 11
     ##   ..$ h2_exp           : num 0.244
     ##   ..$ h2_exp_se        : num 0.0107
@@ -386,9 +386,9 @@ unlist(A[["MRcorrection"]])
     ##                IVs37                IVs38                IVs39 
     ##         "rs11672660"          "rs3810291"           "rs400140" 
     ##    observed_effect_p     corrected_effect  corrected_effect_se 
-    ## "0.0314855203412581"  "0.114571580921726"  "0.053561613723008" 
+    ## "0.0314855203412581"  "0.114571580921726" "0.0534606716148202" 
     ##   corrected_effect_p      test_difference         p_difference 
-    ## "0.0324306952903651"  "-2.35617980011097" "0.0184639782420551"
+    ##   "0.03210504607017"   "-2.3425277023863" "0.0191536120117429"
 
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
@@ -427,7 +427,7 @@ B[["MRcorrection"]]$corrected_effect
 B[["MRcorrection"]]$p_difference
 ```
 
-    ## [1] 6.200377e-10
+    ## [1] 2.565707e-11
 
 ``` r
 # in this case, we observed that the the observed effect estimate obtained using IVW 

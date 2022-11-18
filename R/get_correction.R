@@ -150,7 +150,7 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
         # in some cases with low h2, might get very "bad" corrected effects,
         # mostly when low h2 ...
         # need to remove them : just use 10 sd cutoff
-        filter(corrected < alpha_corrected + 10*sd(res$corrected), corrected > alpha_corrected - 10*sd(res$corrected)) %>%
+        filter(corrected < alpha_corrected + 10*tmp_sd_corrected, corrected > alpha_corrected - 10*tmp_sd_corrected) %>%
         dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/num_groups)) %>%
         tidyr::nest() %>% dplyr::pull(data) -> res_subsets
       subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))

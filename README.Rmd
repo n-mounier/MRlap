@@ -170,11 +170,11 @@ A = MRlap(exposure = BMI,
         "<<< Estimating corrected effect >>>   \n",
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
-        "    corrected effect: 0.115 ( 0.0536 ) \n",
-        "    covariance between observed and corrected effect: 0.00215   \n",
-        "          10000 simulations were used to estimate the variance and the covariance.\n",
+        "    corrected effect: 0.115 ( 0.0535 ) \n",
+        "    covariance between observed and corrected effect: 0.002154   \n",
+        "          5000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  11  second(s). \n")
+        "Runtime of the analysis:  3  minute(s) and  1  second(s). \n")
     ```
 
     
@@ -242,11 +242,11 @@ B = MRlap(exposure = SmallExposure_Data,
         "<<< Estimating corrected effect >>>   \n",
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
-        "    corrected effect: 0.199 ( 0.0265 ) \n",
+        "    corrected effect: 0.199 ( 0.0266 ) \n",
         "    covariance between observed and corrected effect: 0.000625  \n",
-        "          7000 simulations were used to estimate the variance and the covariance.\n",
+        "          10000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  09  second(s). \n")
+        "Runtime of the analysis:  3  minute(s) and  47  second(s). \n")
     ```
 
     
