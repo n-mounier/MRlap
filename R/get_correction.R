@@ -104,80 +104,73 @@ get_correction <- function(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se,
     get_s <- function(s){
       effects = IVs$std_beta.exp
       effects_se = IVs$std_SE.exp
-
       # simulate 500 lambda
       L = matrix(stats::rnorm(s, lambda, lambda_se), ncol=s)/sqrt(n_exp*n_out)
-
       # simulate 500 "instruments sets" - each column = 1 simulation
       E =  matrix(stats::rnorm(nrow(IVs)*s, effects, effects_se), ncol= s)
-
       # simulate 500 h2_LDSC
+      negativeH2 = FALSE
       H = matrix(stats::rnorm(s, h2_LDSC, h2_LDSC_se), ncol=s)
-
+      if(any(H<0)){
+        negativeH2 = TRUE
+        while(!all(H>0)){
+          H[H<0] = stats::rnorm(length(H[H<0]), h2_LDSC, h2_LDSC_se)
+        }
+      }
       # effects + h2 are needed to get pi and therefore sigma
       D = rbind(E, H)
-
       pis = apply(D, 2, function(x) get_geneticArchitecture(x, n_exp, M, Tr))
-
       # simulate 500 alpha_obs
       B =  matrix(stats::rnorm(s, alpha_obs, alpha_obs_se), ncol= s)
-
-
-
       # get 500 alpha_corrected + sd
       all_params = data.frame(pi = pis[1,],
                               sigma = pis[2,],
                               alpha = B[1,],
                               lambda = L[1,])
-
-
       all_params$corrected = apply(all_params, 1, function(x) get_alpha(n_exp, x[4],  x[1], x[2], x[3], Tr))
+      all_params$warning_negH2 = negativeH2
       return(all_params)
     }
-
     res = get_s(s)
-
     num_groups=10
     res %>%
       dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/num_groups)) %>%
       tidyr::nest() %>% dplyr::pull(data) -> res_subsets
     subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
     subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
-
     # check coeffificent(s) of variation
     needmore = F
     if(stats::sd(subsets_var) / base::mean(subsets_var) > sthreshold) needmore=T
     if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
     if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
-
+    tmp_sd_corrected = stats::sd(res$corrected)
     while(needmore){
       res = rbind(res,get_s(s))
       res %>%
+        # in some cases with low h2, might get very "bad" corrected effects,
+        # mostly when low h2 ...
+        # need to remove them : just use 10 sd cutoff
+        filter(corrected < alpha_corrected + 10*sd(res$corrected), corrected > alpha_corrected - 10*sd(res$corrected)) %>%
         dplyr::group_by((dplyr::row_number()-1) %/% (dplyr::n()/num_groups)) %>%
         tidyr::nest() %>% dplyr::pull(data) -> res_subsets
       subsets_var = unlist(lapply(res_subsets, function(x) stats::var(x$corrected)))
       subsets_cov = unlist(lapply(res_subsets,  function(x) stats::cov(x$corrected, x$alpha)))
-
       needmore = F
       if(stats::sd(subsets_var) / base::mean(subsets_var) > sthreshold) needmore=T
       if(stats::sd(subsets_cov) / base::mean(subsets_cov) > sthreshold) needmore=T
       if(extracheck & (alpha_obs_se^2 + stats::sd(res$corrected)^2 - 2* stats::cov(res$alpha, res$corrected))<0) needmore=T
     }
-
-    all_res = c(stats::sd(res$corrected), stats::cov(res$alpha, res$corrected), nrow(res))
-    # normally, remove all temp and return just "res"
+    all_res = c(stats::sd(res$corrected), stats::cov(res$alpha, res$corrected), nrow(res), any(res$warning_negH2))
     return(all_res)
   }
-
   # get SE corrected effects + COV
   se_cov = get_correctedSE(IVs, lambda, lambda_se, h2_LDSC, h2_LDSC_se, alpha_obs, alpha_obs_se, n_exp, n_out, M, Tr)
-
+  # sqrt(h2_LDSC/(my_pi * M)) : NaNs produced
   if(verbose) cat("   ",  "corrected effect:", format(alpha_corrected, digits = 3), "(", format(se_cov[1], digits=3), ")\n")
   if(verbose) cat("   ",  "covariance between observed and corrected effect:", format(se_cov[2], digits=3), "\n")
   if(verbose) cat("           ",  se_cov[3], "simulations were used to estimate the variance and the covariance.\n")
-
+  if(se_cov[4]) warning("some h2 were negative in the parametric bootstrap, please check that the heritability of the exposure is not too low as this might compromise the results.\n")
   if(verbose) cat("> Testing difference between observed and corrected effect... \n")
-
   test_diff = (alpha_obs - alpha_corrected) /
     sqrt(alpha_obs_se^2 + se_cov[1]^2 - 2* se_cov[2])
   p_diff = 2*stats::pnorm(-abs(test_diff), lower.tail=T)

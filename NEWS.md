@@ -1,3 +1,16 @@
+# MRlap 0.0.3.0 (2022-11-18)
+
+## Bug fixes
+- Parametric bootstrap when the exposure has relatively low heritability (and/or when the corresponding standare error is relatively large)   
+
+In such a case, negative heritability values could be generated in the pametric bootstrap. We are now ensuring that this doesn't lead to any error in the bootstrap procedure and added a warning message when this happens, as very low heritability could  compromise the results.
+
+## Changes
+- rsids  
+
+The rsids of the of instruments used are now reported.
+
+
 # MRlap 0.0.2.0 (2021-10-26)
 
 ## Bug fixes

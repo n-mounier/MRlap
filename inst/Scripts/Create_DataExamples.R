@@ -23,7 +23,7 @@ save(SmallOutcome_Data, file="~/Documents/SGG/Projects/MRlap/data/SmallOutcome_D
 
 
 ## Rdata for tests
-# last update, 2022/04/25 (rsids of IVs in results)
+# last update, 2022/11/18 (low h2 check)
 library(MRlap)
 
 # we use ~100K samples for BMI/SBP, with 0% of sample overlap
@@ -42,7 +42,7 @@ saveRDS(A, file="~/Documents/SGG/Projects/MRlap/inst/Data/A.RDS")
 
 
 
-# we use simulated data (standard settings scenatio), with 100% of sample overlap
+# we use simulated data (standard settings scenario), with 100% of sample overlap
 
 data("SmallExposure_Data")
 data("SmallOutcome_Data")

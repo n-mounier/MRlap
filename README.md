@@ -193,11 +193,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.115 ( 0.0527 ) 
-    ##      covariance between observed and corrected effect: 0.00208   
+    ##      corrected effect: 0.115 ( 0.0536 ) 
+    ##      covariance between observed and corrected effect: 0.00215   
     ##            10000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  45  second(s).
+    ##  Runtime of the analysis:  3  minute(s) and  11  second(s).
     ```
 
 </details>
@@ -253,21 +253,21 @@ Show log
     ##  <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ##  <<< Running IVW-MR >>>   
     ##  > Identifying IVs...  
-    ##      215 IVs with p < 5e-10  
+    ##      209 IVs with p < 5e-10  
     ##      0 IVs excluded - more strongly associated with the outcome than with the exposure, p < 1e-03  
     ##     Pruning : distance :  500 Kb  - LD threshold :  0.05  
-    ##      36 IVs left after pruning  
+    ##      38 IVs left after pruning  
     ##  > Performing MR  
-    ##      IVW-MR observed effect: 0.223 ( 0.0227 ) 
+    ##      IVW-MR observed effect: 0.217 ( 0.0235 ) 
     ##  <><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> 
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.204 ( 0.0257 ) 
-    ##      covariance between observed and corrected effect: 0.000583  
+    ##      corrected effect: 0.199 ( 0.0265 ) 
+    ##      covariance between observed and corrected effect: 0.000625  
     ##            7000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  42  second(s).
+    ##  Runtime of the analysis:  3  minute(s) and  09  second(s).
     ```
 
 </details>
@@ -334,10 +334,10 @@ str(A)
     ##   ..$ IVs                : chr [1:39] "rs684382" "rs2051086" "rs543874" "rs6728726" ...
     ##   ..$ observed_effect_p  : num 0.0315
     ##   ..$ corrected_effect   : num 0.115
-    ##   ..$ corrected_effect_se: num 0.0535
-    ##   ..$ corrected_effect_p : num 0.0323
-    ##   ..$ test_difference    : num -2.35
-    ##   ..$ p_difference       : num 0.0189
+    ##   ..$ corrected_effect_se: num 0.0536
+    ##   ..$ corrected_effect_p : num 0.0324
+    ##   ..$ test_difference    : num -2.36
+    ##   ..$ p_difference       : num 0.0185
     ##  $ LDSC               :List of 11
     ##   ..$ h2_exp           : num 0.244
     ##   ..$ h2_exp_se        : num 0.0107
@@ -388,9 +388,9 @@ unlist(A[["MRcorrection"]])
     ##                IVs37                IVs38                IVs39 
     ##         "rs11672660"          "rs3810291"           "rs400140" 
     ##    observed_effect_p     corrected_effect  corrected_effect_se 
-    ## "0.0314855203412581"  "0.114571580921726" "0.0535168157373563" 
+    ## "0.0314855203412581"  "0.114571580921726"  "0.053561613723008" 
     ##   corrected_effect_p      test_difference         p_difference 
-    ## "0.0322859766459089"  "-2.34838999741478"  "0.018854767642572"
+    ## "0.0324306952903651"  "-2.35617980011097" "0.0184639782420551"
 
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
@@ -415,21 +415,21 @@ unlist(A[["LDSC"]])
 B[["MRcorrection"]]$observed_effect
 ```
 
-    ## [1] 0.2226876
+    ## [1] 0.2167283
 
 ``` r
 # corrected effect
 B[["MRcorrection"]]$corrected_effect
 ```
 
-    ## [1] 0.2043047
+    ## [1] 0.1985984
 
 ``` r
 # difference p-value
 B[["MRcorrection"]]$p_difference
 ```
 
-    ## [1] 1.4104e-54
+    ## [1] 6.200377e-10
 
 ``` r
 # in this case, we observed that the the observed effect estimate obtained using IVW 
@@ -441,7 +441,7 @@ unlist(B[["GeneticArchitecture"]])
 ```
 
     ##        polygenicity perSNP_heritability 
-    ##        0.0009415670        0.0003768239
+    ##        0.0008382092        0.0004034253
 
 ## Runtime
 

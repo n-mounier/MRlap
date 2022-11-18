@@ -170,11 +170,11 @@ A = MRlap(exposure = BMI,
         "<<< Estimating corrected effect >>>   \n",
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
-        "    corrected effect: 0.115 ( 0.0527 ) \n",
-        "    covariance between observed and corrected effect: 0.00208   \n",
+        "    corrected effect: 0.115 ( 0.0536 ) \n",
+        "    covariance between observed and corrected effect: 0.00215   \n",
         "          10000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  45  second(s). \n")
+        "Runtime of the analysis:  3  minute(s) and  11  second(s). \n")
     ```
 
     
@@ -232,21 +232,21 @@ B = MRlap(exposure = SmallExposure_Data,
         "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
         "<<< Running IVW-MR >>>   \n",
         "> Identifying IVs...  \n",
-        "    215 IVs with p < 5e-10  \n",
+        "    209 IVs with p < 5e-10  \n",
         "    0 IVs excluded - more strongly associated with the outcome than with the exposure, p < 1e-03  \n",
         "   Pruning : distance :  500 Kb  - LD threshold :  0.05  \n",
-        "    36 IVs left after pruning  \n",
+        "    38 IVs left after pruning  \n",
         "> Performing MR  \n",
-        "    IVW-MR observed effect: 0.223 ( 0.0227 ) \n",
+        "    IVW-MR observed effect: 0.217 ( 0.0235 ) \n",
         "<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n", 
         "<<< Estimating corrected effect >>>   \n",
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
-        "    corrected effect: 0.204 ( 0.0257 ) \n",
-        "    covariance between observed and corrected effect: 0.000583  \n",
+        "    corrected effect: 0.199 ( 0.0265 ) \n",
+        "    covariance between observed and corrected effect: 0.000625  \n",
         "          7000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  42  second(s). \n")
+        "Runtime of the analysis:  3  minute(s) and  09  second(s). \n")
     ```
 
     
