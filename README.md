@@ -460,9 +460,13 @@ Pro (2020) - Processor : 2 GHz Quad-Core Intel Core i5 - Memory : 16 GB
 
 ## Citation
 
-<!--- If you use the `MRlap` package, please cite:
+-   to be added -  
+    Note that some of the scripts used to perform the analyses presented
+    in the paper are available
+    [here](https://github.com/n-mounier/MRlap_Analyses).  
+    <!--- If you use the `MRlap` package, please cite:
 
-[Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
+    [Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
 
 ## Contact
 
