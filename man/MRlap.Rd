@@ -4,10 +4,22 @@
 \alias{MRlap}
 \title{MRlap - main function}
 \usage{
-MRlap(exposure, exposure_name = NULL, outcome, outcome_name = NULL, ld,
-  hm3, MR_threshold = 5e-08, MR_pruning_dist = 500,
-  MR_pruning_LD = 0, MR_reverse = 0.001, save_logfiles = FALSE,
-  verbose = TRUE)
+MRlap(
+  exposure,
+  exposure_name = NULL,
+  outcome,
+  outcome_name = NULL,
+  ld,
+  hm3,
+  do_pruning = TRUE,
+  user_SNPsToKeep = "",
+  MR_threshold = 5e-08,
+  MR_pruning_dist = 500,
+  MR_pruning_LD = 0,
+  MR_reverse = 0.001,
+  save_logfiles = FALSE,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{exposure}{The path to the file containing the GWAS summary statistics for the exposure,
@@ -25,6 +37,13 @@ Expects LD scores formated as required by the original LD score regression softw
 
 \item{hm3}{The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
 (character)}
+
+\item{do_pruning}{A logical indicating MRlap should identify lead SNPs via pruning (if FALSE, the user should 
+  provide with user_SNPsToKeep,
+\code{default=TRUE}}
+
+\item{user_SNPsToKeep}{A vector of SNP RSIDs to use as the instrumental variables (only used if do_pruning==TRUE), 
+\code{default=""} (character)}
 
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
 than 1e-5, \code{default=5e-8} (numeric)}
