@@ -4,7 +4,8 @@
 \name{SmallOutcome_Data}
 \alias{SmallOutcome_Data}
 \title{Outcome}
-\format{A data frame with 750,000 rows and 13 variables:
+\format{
+A data frame with 750,000 rows and 13 variables:
 \describe{
   \item{chr}{chromosome}
   \item{rsid}{rsid of the SNP}
@@ -19,7 +20,8 @@
   \item{minuslog10p}{-log10(p) for the SNP}
   \item{p}{p-value for the SNP}
   \item{N}{sample size}
-}}
+}
+}
 \source{
 \url{}
 }

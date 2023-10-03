@@ -20,7 +20,8 @@ Imports:
     rlang,
     stringr,
     TwoSampleMR,
-    GenomicSEM
+    GenomicSEM,
+    ieugwasr
 Remotes: 
   MRCIEU/TwoSampleMR,
   GenomicSEM/GenomicSEM

@@ -28,6 +28,10 @@
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param MR_reverse The p-value used to exclude MR instruments that are more strongly associated with the outcome
 #'        than with the exposure,\code{default=1e-3} (numeric)
+#' @param MR_plink A string. Path to Plink v1.90 binary (if left as NULL will not use local installation if LD pruning),
+#'        \code{default=""} (character)
+#' @param MR_bfile A string. Path to appropriate BIM/BED reference panel files on your server,
+#'        \code{default=""} (character)
 # #' @param s The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
 # #'        effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)
 #' @param save_logfiles  A logical indicating if log files from LDSC should be saved,
@@ -66,6 +70,8 @@ MRlap <- function(exposure,
                   MR_pruning_dist = 500,
                   MR_pruning_LD = 0,
                   MR_reverse = 1e-3,
+                  MR_plink = NULL,
+                  MR_bfile = NULL,
                   #s=10000,
                   save_logfiles = FALSE,
                   verbose = TRUE) {
@@ -170,9 +176,10 @@ MRlap <- function(exposure,
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Running IVW-MR >>>  \n")
   # returns alpha - SE alpha - instruments (needed for corrected effect SE)
-  MR_results = run_MR(exposure_data, outcome_data, MR_threshold,
-                      MR_pruning_dist, MR_pruning_LD, MR_reverse,
+  MR_results = run_MR(exposure_data, outcome_data, MR_threshold, 
                       do_pruning, user_SNPsToKeep,
+                      MR_pruning_dist, MR_pruning_LD, MR_reverse,
+                      MR_plink, MR_bfile,
                       verbose)
   # -> alpha_obs, alpha_obs_se, n_exp, n_out, IVs
   # 3 : get corrected effect

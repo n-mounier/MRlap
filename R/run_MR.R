@@ -19,11 +19,13 @@
 run_MR <- function(exposure_data,
                    outcome_data,
                    MR_threshold = 5e-8,
+                   do_pruning = TRUE,
+                   user_SNPsToKeep = "",
                    MR_pruning_dist = 500,
                    MR_pruning_LD = 0,
                    MR_reverse = NULL,
-                   do_pruning = TRUE,
-                   user_SNPsToKeep = "",
+                   MR_plink = NULL,
+                   MR_bfile = NULL,
                    verbose = TRUE){
 
   # here we need to join exposure and outcome data
@@ -71,12 +73,23 @@ run_MR <- function(exposure_data,
     
     if(MR_pruning_LD>0){# LD-pruning
       if(verbose) cat("   Pruning : distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
-      # Do pruning, chr by chr
+      # Do pruning
       SNPsToKeep = c()
-      for(chr in unique(ToPrune$chr_name)){
-        SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
+      # use remote clumping?
+      if(is.null(MR_plink)){
+        for(chr in unique(ToPrune$chr_name)){
+          SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
+        }
+      } else { # use local clumping
+        if(verbose) cat("Using ieugwasr::ld_clump with local PLINK")
+          ToPrune = ToPrune |> dplyr::select(rsid = SNP, chr = chr_name, pos = chr_start, pval = pval.exposure)
+          SNPsToKeep = ieugwasr::ld_clump(ToPrune,
+                                          clump_kb = MR_pruning_dist,
+                                          clump_r2 = MR_pruning_LD,
+                                          plink_bin = MR_plink,
+                                          bfile = MR_bfile)$rsid
       }
-    } else{# distance pruning
+    } else{ # distance pruning
       prune_byDistance <- function(data, prune.dist=100, byP=T) {
         # data should be : 1st column rs / 2nd column chr / 3rd column pos / 4th column stat
         # if byP = T : stat = p-value -> min is better

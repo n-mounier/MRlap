@@ -17,6 +17,8 @@ MRlap(
   MR_pruning_dist = 500,
   MR_pruning_LD = 0,
   MR_reverse = 0.001,
+  MR_plink = NULL,
+  MR_bfile = NULL,
   save_logfiles = FALSE,
   verbose = TRUE
 )
@@ -56,6 +58,12 @@ than 1e-5, \code{default=5e-8} (numeric)}
 
 \item{MR_reverse}{The p-value used to exclude MR instruments that are more strongly associated with the outcome
 than with the exposure,\code{default=1e-3} (numeric)}
+
+\item{MR_plink}{A string. Path to Plink v1.90 binary (if left as NULL will not use local installation if LD pruning),
+\code{default=""} (character)}
+
+\item{MR_bfile}{A string. Path to appropriate BIM/BED reference panel files on your server,
+\code{default=""} (character)}
 
 \item{save_logfiles}{A logical indicating if log files from LDSC should be saved,
 \code{default=FALSE}}
