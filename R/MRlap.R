@@ -144,10 +144,10 @@ MRlap <- function(exposure,
   }
 
   ## user-provided SNP list?
-  if (do_pruning){
+  if (!do_pruning){
     if(verbose) cat("Will not do pruning - user is providing a list of SNPs to use as IVs\n")
     if (!is.character(user_SNPsToKeep))  stop("If `do_pruning` is FALSE then need to provide a character vector in `user_SNPsToKeep`", call. = FALSE)
-    if (length(user_SNPsToKeep)==0)  stop("If `do_pruning` is FALSE then need to provide a character vector in `user_SNPsToKeep`", call. = FALSE)
+    if (length(user_SNPsToKeep)<3)  stop("If `do_pruning` is FALSE then need to provide a character vector of at least 3 IVs to `user_SNPsToKeep`", call. = FALSE)
   }
 
   # 0 : Tidy input GWAS

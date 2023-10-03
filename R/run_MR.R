@@ -82,12 +82,12 @@ run_MR <- function(exposure_data,
         }
       } else { # use local clumping
         if(verbose) cat("Using ieugwasr::ld_clump with local PLINK")
-          ToPrune = ToPrune |> dplyr::select(rsid = SNP, chr = chr_name, pos = chr_start, pval = pval.exposure)
-          SNPsToKeep = ieugwasr::ld_clump(ToPrune,
-                                          clump_kb = MR_pruning_dist,
-                                          clump_r2 = MR_pruning_LD,
-                                          plink_bin = MR_plink,
-                                          bfile = MR_bfile)$rsid
+        ToPrune = ToPrune |> dplyr::select(rsid = SNP, chr = chr_name, pos = chr_start, pval = pval.exposure)
+        SNPsToKeep = ieugwasr::ld_clump(ToPrune,
+                                        clump_kb = MR_pruning_dist,
+                                        clump_r2 = MR_pruning_LD,
+                                        plink_bin = MR_plink,
+                                        bfile = MR_bfile)$rsid
       }
     } else{ # distance pruning
       prune_byDistance <- function(data, prune.dist=100, byP=T) {
