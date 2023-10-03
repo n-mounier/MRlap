@@ -139,6 +139,11 @@ MRlap <- function(exposure,
 
   if(MR_pruning_LD>0){
     if(verbose) cat("The LD threshold used for pruning MR instruments is:", MR_pruning_LD, "\n")
+    if(!is.null(MR_plink)){
+      if(verbose)  cat("Will use local Plink binary:", MR_plink, "\n")
+      if(verbose)  cat("Local Plink bfile path:", MR_bfile, "\n")
+      if(!file.exists(paste0(MR_bfile,".bed")))  stop("MR_bfile: no .bed file exists at provided path", call. = FALSE)
+    }
   } else {
     if(verbose) cat("Distance-based pruning will be used for MR instruments \n")
   }
