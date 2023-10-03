@@ -1,3 +1,10 @@
+# MRlap 0.0.3.1 (2023-10-03)
+
+## Changes
+- User can use local installation of Plink for LD clumping with a custom reference panel (using `MR_plink` and `MR_bfile` options)
+- User can turn of automatic pruning and instead provide own list of variants to use as Instrumental Variables (using `do_pruning` and `user_SNPsToKeep` options)
+
+
 # MRlap 0.0.3.0 (2022-11-18)
 
 ## Bug fixes
