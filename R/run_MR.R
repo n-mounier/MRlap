@@ -19,9 +19,13 @@
 run_MR <- function(exposure_data,
                    outcome_data,
                    MR_threshold = 5e-8,
+                   do_pruning = TRUE,
+                   user_SNPsToKeep = "",
                    MR_pruning_dist = 500,
                    MR_pruning_LD = 0,
                    MR_reverse = NULL,
+                   MR_plink = NULL,
+                   MR_bfile = NULL,
                    verbose = TRUE){
 
   # here we need to join exposure and outcome data
@@ -59,49 +63,66 @@ run_MR <- function(exposure_data,
   # if no IVs, stop()
   if(nrow(data_thresholded)==0) stop("no IV left after excluding IVs more strongly associated with the outcome than with the exposure")
 
-
-  data_thresholded %>%
-    dplyr::transmute(SNP = .data$rsid,
-                     chr_name = .data$chr,
-                     chr_start = .data$pos,
-                     pval.exposure = .data$p.exp) -> ToPrune
-
-  if(MR_pruning_LD>0){# LD-pruning
-    if(verbose) cat("   Pruning : distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
-    # Do pruning, chr by chr
-    SNPsToKeep = c()
-    for(chr in unique(ToPrune$chr_name)){
-      SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
-    }
-  } else{# distance pruning
-    prune_byDistance <- function(data, prune.dist=100, byP=T) {
-      # data should be : 1st column rs / 2nd column chr / 3rd column pos / 4th column stat
-      # if byP = T : stat = p-value -> min is better
-      # if byP = F : stat = Zstat, beta.. -> max is better
-
-      if(byP){
-        SNP_order = order(data %>% dplyr::pull(4))
-      } else {
-        SNP_order = order(data %>% dplyr::pull(4), decreasing = T)
-      }
-      data = data[SNP_order,]
-      snp=0
-      while(T){
-        snp=snp+1
-        ToRemove=which(data$chr_name==data$chr_name[snp] & abs(data$chr_start - data$chr_start[snp])<prune.dist*1000)
-        if(length(ToRemove)>1){
-          ToRemove = ToRemove[-1]
-          data = data[-ToRemove,]
+  # doing pruning? Or using user-provided SNPsToKeep?
+  if (do_pruning)  {
+    data_thresholded %>%
+      dplyr::transmute(SNP = .data$rsid,
+                       chr_name = .data$chr,
+                       chr_start = .data$pos,
+                       pval.exposure = .data$p.exp) -> ToPrune
+    
+    if(MR_pruning_LD>0){# LD-pruning
+      if(verbose) cat("   Pruning : distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
+      # Do pruning
+      SNPsToKeep = c()
+      # use remote clumping?
+      if(is.null(MR_plink)){
+        for(chr in unique(ToPrune$chr_name)){
+          SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
         }
-        if(snp==nrow(data)) break
+      } else { # use local clumping
+        if(verbose) cat("Using ieugwasr::ld_clump with local PLINK")
+        ToPrune = ToPrune |> dplyr::select(rsid = SNP, chr = chr_name, pos = chr_start, pval = pval.exposure)
+        SNPsToKeep = ieugwasr::ld_clump(ToPrune,
+                                        clump_kb = MR_pruning_dist,
+                                        clump_r2 = MR_pruning_LD,
+                                        plink_bin = MR_plink,
+                                        bfile = MR_bfile)$rsid
       }
-
-      return(unlist(data[,1]))
-
+    } else{ # distance pruning
+      prune_byDistance <- function(data, prune.dist=100, byP=T) {
+        # data should be : 1st column rs / 2nd column chr / 3rd column pos / 4th column stat
+        # if byP = T : stat = p-value -> min is better
+        # if byP = F : stat = Zstat, beta.. -> max is better
+    
+        if(byP){
+          SNP_order = order(data %>% dplyr::pull(4))
+        } else {
+          SNP_order = order(data %>% dplyr::pull(4), decreasing = T)
+        }
+        data = data[SNP_order,]
+        snp=0
+        while(T){
+          snp=snp+1
+          ToRemove=which(data$chr_name==data$chr_name[snp] & abs(data$chr_start - data$chr_start[snp])<prune.dist*1000)
+          if(length(ToRemove)>1){
+            ToRemove = ToRemove[-1]
+            data = data[-ToRemove,]
+          }
+          if(snp==nrow(data)) break
+        }
+    
+        return(unlist(data[,1]))
+    
+      }
+      if(verbose) cat("   Pruning : distance : ", MR_pruning_dist, "Kb \n")
+      SNPsToKeep = prune_byDistance(ToPrune, prune.dist=MR_pruning_dist, byP=T)
     }
-    if(verbose) cat("   Pruning : distance : ", MR_pruning_dist, "Kb \n")
-    SNPsToKeep = prune_byDistance(ToPrune, prune.dist=MR_pruning_dist, byP=T)
+  } else {  # use user-provided SNPsToKeep
+    SNPsToKeep = user_SNPsToKeep
   }
+  
+  # get "pruned" data
   data_thresholded %>%
     dplyr::filter(.data$rsid %in% SNPsToKeep) -> data_pruned
 
