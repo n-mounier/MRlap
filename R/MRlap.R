@@ -15,10 +15,10 @@
 #'        Expects LD scores formated as required by the original LD score regression software.  (character)
 #' @param hm3 The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
 #'        (character)
-#' @param do_pruning  A logical indicating MRlap should identify lead SNPs via pruning (if FALSE, the user should 
-#'          provide with user_SNPsToKeep,
+#' @param do_pruning  A logical indicating MRlap should identify lead SNPs via pruning (if FALSE, the user should
+#'          provide with user_SNPsToKeep, and all the MR_[...] parameters will be ignored),
 #'        \code{default=TRUE}
-#' @param user_SNPsToKeep A vector of SNP RSIDs to use as the instrumental variables (only used if do_pruning==TRUE), 
+#' @param user_SNPsToKeep A vector of SNP RSIDs to use as the instrumental variables (only used if do_pruning==FALSE),
 #'        \code{default=""} (character)
 #' @param MR_threshold The threshold used to select strong instruments for MR, should be lower
 #'        than 1e-5, \code{default=5e-8} (numeric)
@@ -28,9 +28,9 @@
 #'        (if 0, distance-based pruning is used), \code{default=0} (numeric)
 #' @param MR_reverse The p-value used to exclude MR instruments that are more strongly associated with the outcome
 #'        than with the exposure,\code{default=1e-3} (numeric)
-#' @param MR_plink A string. Path to Plink v1.90 binary (if left as NULL will not use local installation if LD pruning),
+#' @param MR_plink The path to to Plink v1.90 binary (if left as NULL will not use local installation if LD pruning),
 #'        \code{default=""} (character)
-#' @param MR_bfile A string. Path to appropriate BIM/BED reference panel files on your server,
+#' @param MR_bfile The path to appropriate BIM/BED reference panel files on your server,
 #'        \code{default=""} (character)
 # #' @param s The number of simulations used in the sampling strategy to estimate the variance of the corrected causal
 # #'        effect and the covariance between observed and corrected effects \code{default=10,000} (numeric)
@@ -118,41 +118,45 @@ MRlap <- function(exposure,
   } else stop("hm3 : wrong format, should be character", call. = FALSE)
 
 
-  ## MR_threshold -> should not be larger than 10-5, can only be more stringent
-  if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
-  if(MR_threshold>10^-5) stop("MR_threshold : superior to the threshold limit", call. = FALSE)
-
-  if(verbose) cat("The p-value threshold used for selecting MR instruments is:", format(MR_threshold, scientific = T), "\n")
-
-  ## MR_pruning_dist
-  if(!is.numeric(MR_pruning_dist)) stop("MR_pruning_dist : non-numeric argument", call. = FALSE)
-  if(MR_pruning_dist<10) stop("MR_pruning_dist : should be higher than 10Kb", call. = FALSE)
-  if(MR_pruning_dist>50000) stop("MR_pruning_dist : should be lower than 50Mb", call. = FALSE)
-
-
-  if(verbose) cat("The distance used for pruning MR instruments is: ", MR_pruning_dist, "Kb \n")
-
-  ## MR_pruning_LD
-  if(!is.numeric(MR_pruning_LD)) stop("MR_pruning_LD : non-numeric argument", call. = FALSE)
-  if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
-  if(MR_pruning_LD>1) stop("MR_pruning_LD : should not be larger than 1", call. = FALSE)
-
-  if(MR_pruning_LD>0){
-    if(verbose) cat("The LD threshold used for pruning MR instruments is:", MR_pruning_LD, "\n")
-    if(!is.null(MR_plink)){
-      if(verbose)  cat("Will use local Plink binary:", MR_plink, "\n")
-      if(verbose)  cat("Local Plink bfile path:", MR_bfile, "\n")
-      if(!file.exists(paste0(MR_bfile,".bed")))  stop("MR_bfile: no .bed file exists at provided path", call. = FALSE)
-    }
-  } else {
-    if(verbose) cat("Distance-based pruning will be used for MR instruments \n")
-  }
-
   ## user-provided SNP list?
   if (!do_pruning){
     if(verbose) cat("Will not do pruning - user is providing a list of SNPs to use as IVs\n")
     if (!is.character(user_SNPsToKeep))  stop("If `do_pruning` is FALSE then need to provide a character vector in `user_SNPsToKeep`", call. = FALSE)
     if (length(user_SNPsToKeep)<3)  stop("If `do_pruning` is FALSE then need to provide a character vector of at least 3 IVs to `user_SNPsToKeep`", call. = FALSE)
+  } else {
+
+
+    ## MR_threshold -> should not be larger than 10-5, can only be more stringent
+    if(!is.numeric(MR_threshold)) stop("MR_threshold : non-numeric argument", call. = FALSE)
+    if(MR_threshold>10^-5) stop("MR_threshold : superior to the threshold limit", call. = FALSE)
+
+    if(verbose) cat("The p-value threshold used for selecting MR instruments is:", format(MR_threshold, scientific = T), "\n")
+
+    ## MR_pruning_dist
+    if(!is.numeric(MR_pruning_dist)) stop("MR_pruning_dist : non-numeric argument", call. = FALSE)
+    if(MR_pruning_dist<10) stop("MR_pruning_dist : should be higher than 10Kb", call. = FALSE)
+    if(MR_pruning_dist>50000) stop("MR_pruning_dist : should be lower than 50Mb", call. = FALSE)
+
+
+    if(verbose) cat("The distance used for pruning MR instruments is: ", MR_pruning_dist, "Kb \n")
+
+    ## MR_pruning_LD
+    if(!is.numeric(MR_pruning_LD)) stop("MR_pruning_LD : non-numeric argument", call. = FALSE)
+    if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
+    if(MR_pruning_LD>1) stop("MR_pruning_LD : should not be larger than 1", call. = FALSE)
+
+    need_chrpos=TRUE
+    if(MR_pruning_LD>0){
+      if(verbose) cat("The LD threshold used for pruning MR instruments is:", MR_pruning_LD, "\n")
+      if(!is.null(MR_plink)){
+        if(verbose)  cat("Will use local Plink binary:", MR_plink, "\n")
+        if(verbose)  cat("Local Plink bfile path:", MR_bfile, "\n")
+        if(!file.exists(paste0(MR_bfile,".bed")))  stop("MR_bfile: no .bed file exists at provided path", call. = FALSE)
+        need_chrpos=FALSE
+      }
+    } else {
+      if(verbose) cat("Distance-based pruning will be used for MR instruments \n")
+    }
   }
 
   # 0 : Tidy input GWAS
@@ -161,10 +165,10 @@ MRlap <- function(exposure,
 
   if(verbose) cat(paste0("> Processing exposure ", ifelse(is.null(exposure_name), "", paste0("(",exposure_name,") ")) ,"summary statistics... \n"))
   if(is.null(exposure_name)) exposure_name="exposure"
-  exposure_data = tidy_inputGWAS(exposure, verbose)
+  exposure_data = tidy_inputGWAS(exposure, need_chrpos, verbose)
   if(verbose) cat(paste0("> Processing outcome ", ifelse(is.null(outcome_name), "", paste0("(",outcome_name,") ")) ,"summary statistics... \n"))
   if(is.null(outcome_name)) outcome_name="outcome"
-  outcome_data = tidy_inputGWAS(outcome, verbose)
+  outcome_data = tidy_inputGWAS(outcome, need_chrpos, verbose)
 
 
 
@@ -174,16 +178,16 @@ MRlap <- function(exposure,
   # returns h2 exposure - SE h2 exposure - cross-trait intercept - SE cross-trait intercept
   LDSC_results = run_LDSC(exposure_data, exposure_name,
                           outcome_data, outcome_name, ld, hm3, save_logfiles, verbose)
-  # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
+  # # -> h2_LDSC, h2_LDSC_se, lambda, lambda_se (for correction)
   #     int_exp, int_out,  h2_out, h2_out_se, rgcov, rgcov_se, rg
 
   # 2 : run IVW-MR
   if(verbose) cat("<><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><><> \n")
   if(verbose) cat("<<< Running IVW-MR >>>  \n")
   # returns alpha - SE alpha - instruments (needed for corrected effect SE)
-  MR_results = run_MR(exposure_data, outcome_data, MR_threshold, 
+  MR_results = run_MR(exposure_data, outcome_data,
                       do_pruning, user_SNPsToKeep,
-                      MR_pruning_dist, MR_pruning_LD, MR_reverse,
+                      MR_threshold, MR_pruning_dist, MR_pruning_LD, MR_reverse,
                       MR_plink, MR_bfile,
                       verbose)
   # -> alpha_obs, alpha_obs_se, n_exp, n_out, IVs

@@ -16,9 +16,9 @@ sticker(imgurl,
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->
 
 :information\_source: `MRlap` is still under active development.  
-:information\_source: `MRlap` has been updated to version 0.0.3. Note
-that in previous versions the exclusion of IVs more strong associated
-with the outcome than with the exposure was not correcltly performed.  
+:information\_source: `MRlap` has been updated to version 0.0.3.  
+Note that in version 0.0.1 the exclusion of IVs more strong associated
+with the outcome than with the exposure was not correctly performed.  
 Check the [NEWS](NEWS.md) to learn more about what has been modified!
 
 ## Overview
@@ -54,7 +54,9 @@ This package builds up on the
 [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to
 perform cross-trait LDSC and the
 [`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for
-inverse-variance weighted (IVW-)MR analysis (and instruments pruning).
+inverse-variance weighted (IVW-)MR analysis, and on the
+[`ieugwasr`](https://github.com/MRCIEU/ieugwasr/) for instruments
+pruning.
 
 There is only one function available:
 
@@ -100,6 +102,11 @@ from effect size and standard error, in which case the following columns
 should be provided:  
 Effect-size: `b`, `beta`, `beta1` , `or`  
 Standard error: `se`, `std`
+
+To perform distance-pruning of instruments, the following columns must
+also be present:  
+chromosome: `chr`  
+position: `pos`
 
 *If (at least) one of the datasets is coming from a case-control
 GWAS:*  
@@ -192,10 +199,10 @@ Show log
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
     ##      corrected effect: 0.115 ( 0.0535 ) 
-    ##      covariance between observed and corrected effect: 0.002154   
-    ##            5000 simulations were used to estimate the variance and the covariance.
+    ##      covariance between observed and corrected effect: 0.00209   
+    ##            7000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  1  second(s).
+    ##  Runtime of the analysis:  2  minute(s) and  19  second(s).
     ```
 
 </details>
@@ -261,11 +268,11 @@ Show log
     ##  <<< Estimating corrected effect >>>   
     ##  > Estimating genetic architecture parameters...  
     ##  > Estimating corrected effect...  
-    ##      corrected effect: 0.199 ( 0.0266 ) 
-    ##      covariance between observed and corrected effect: 0.000625  
-    ##            10000 simulations were used to estimate the variance and the covariance.
+    ##      corrected effect: 0.199 ( 0.0263 ) 
+    ##      covariance between observed and corrected effect: 0.000615  
+    ##            5000 simulations were used to estimate the variance and the covariance.
     ##  > Testing difference between observed and corrected effect...  
-    ##  Runtime of the analysis:  3  minute(s) and  47  second(s).
+    ##  Runtime of the analysis:  4  minute(s) and  24  second(s).
     ```
 
 </details>
@@ -332,10 +339,10 @@ str(A)
     ##   ..$ IVs                : chr [1:39] "rs684382" "rs2051086" "rs543874" "rs6728726" ...
     ##   ..$ observed_effect_p  : num 0.0315
     ##   ..$ corrected_effect   : num 0.115
-    ##   ..$ corrected_effect_se: num 0.0535
-    ##   ..$ corrected_effect_p : num 0.0321
-    ##   ..$ test_difference    : num -2.34
-    ##   ..$ p_difference       : num 0.0192
+    ##   ..$ corrected_effect_se: num 0.0528
+    ##   ..$ corrected_effect_p : num 0.0299
+    ##   ..$ test_difference    : num -2.09
+    ##   ..$ p_difference       : num 0.0366
     ##  $ LDSC               :List of 11
     ##   ..$ h2_exp           : num 0.244
     ##   ..$ h2_exp_se        : num 0.0107
@@ -386,9 +393,9 @@ unlist(A[["MRcorrection"]])
     ##                IVs37                IVs38                IVs39 
     ##         "rs11672660"          "rs3810291"           "rs400140" 
     ##    observed_effect_p     corrected_effect  corrected_effect_se 
-    ## "0.0314855203412581"  "0.114571580921726" "0.0534606716148202" 
+    ## "0.0314855203412581"  "0.114571580921726" "0.0527597592604324" 
     ##   corrected_effect_p      test_difference         p_difference 
-    ##   "0.03210504607017"   "-2.3425277023863" "0.0191536120117429"
+    ## "0.0298880110012367"  "-2.09064664078765" "0.0365597514941605"
 
 ``` r
 # in this case, we observed that the corrected effects points towards an underestimation
@@ -427,7 +434,7 @@ B[["MRcorrection"]]$corrected_effect
 B[["MRcorrection"]]$p_difference
 ```
 
-    ## [1] 2.565707e-11
+    ## [1] 2.075921e-05
 
 ``` r
 # in this case, we observed that the the observed effect estimate obtained using IVW 
@@ -443,9 +450,9 @@ unlist(B[["GeneticArchitecture"]])
 
 ## Runtime
 
-Example A \~ 3 minutes 40 seconds
+Example A \~ 2 minutes 19 seconds
 
-Example B \~ 3 minutes 35 seconds
+Example B \~ 4 minutes 24 seconds
 
 The runtime can be influenced by the size of the summary statistics
 files, the approach used for pruning (distance vs LD) but also by the
@@ -458,15 +465,21 @@ automatically determined in the analysis).
 Pro (2020) - Processor : 2 GHz Quad-Core Intel Core i5 - Memory : 16 GB
 3733 MHz LPDDR4X.</font> </small>
 
+## Contributors
+
+A huge thanks to the people helping with `MRlap` improvements!
+
+[Luke Pilling](https://github.com/lukepilling)
+
 ## Citation
 
--   to be added -  
-    Note that some of the scripts used to perform the analyses presented
-    in the paper are available
-    [here](https://github.com/n-mounier/MRlap_Analyses).  
-    <!--- If you use the `MRlap` package, please cite:
-
-    [Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
+If you use the `MRlap` package, please cite: [Ninon Mounier, Zoltán
+Kutalik, Bias correction for inverse variance weighting Mendelian
+randomization, Genetic
+Epidemiology](https://doi.org/10.1002/gepi.22522)  
+Note that some of the scripts used to perform the analyses presented in
+the paper are available
+[here](https://github.com/n-mounier/MRlap_Analyses).
 
 ## Contact
 

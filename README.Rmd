@@ -36,7 +36,8 @@ sticker(imgurl,
 <!--- :arrow_right: ESHG/EMGM?? poster is available [here]().  --->    
 
 :information\_source: `MRlap` is still under active development.    
-:information\_source: `MRlap` has been updated to version 0.0.3. Note that in previous versions the exclusion of IVs more strong associated with the outcome than with the exposure was not correcltly performed.           
+:information\_source: `MRlap` has been updated to version 0.0.3.  
+Note that in version 0.0.1 the exclusion of IVs more strong associated with the outcome than with the exposure was not correctly performed.           
 Check the [NEWS](NEWS.md) to learn more about what has been modified\!
 
 ## Overview
@@ -45,7 +46,7 @@ Check the [NEWS](NEWS.md) to learn more about what has been modified\!
 `MRlap` is an R-package to perform two-sample Mendelian Randomisation (MR) analyses using (potentially) overlapping samples, relying only on GWAS summary statistics. MR estimates can be subject to different types of biases due to the overlap between the exposure and outcome samples, the use of weak instruments and winner’s curse. Our approach simultaneously accounts and corrects for all these biases, using cross-trait LD-score regression (LDSC) to approximate the overlap. Estimating the corrected effect using our approach can be performed as a sensitivity analysis: if the corrected effect do not significantly differ from the observed effect, then IVW-MR estimate can be safely used. However, when there is a significant difference, corrected effects should be preferred as they should be less biased, independently of the sample overlap.   
 Note that we are working with standardised effects. This means that the causal effect estimates are in units of Standard Deviation (SD). The causal effect estimates correspond to the SD change in the outcome for one SD increase in the exposure.    
 It is possible to use case-control GWASs, but it is important to note that our method assumes that sample overlap should be independend of case-control status. Morever, the analysis needs to be performed on the observed scale. This means that GWAS results (from a linear model using case-control status or from a logisitic regression) should be provided alongside the total (number of cases + number of controls) sample size. In such cases, the heritability estimates reported in the results will be different to the ones that are usually estimated (on the liability scale), this is normal. The causal effect estimates correspond to the SD changes / increases on the observed scale.    
-This package builds up on the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to perform cross-trait LDSC and the [`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for inverse-variance weighted (IVW-)MR analysis (and instruments pruning). 
+This package builds up on the [`GenomicSEM`](https://github.com/GenomicSEM/GenomicSEM/) R-package to perform cross-trait LDSC and the [`TwoSampleMR`](https://github.com/MRCIEU/TwoSampleMR/) R-package for inverse-variance weighted (IVW-)MR analysis, and on the [`ieugwasr`](https://github.com/MRCIEU/ieugwasr/) for instruments pruning. 
 
 
 There is only one function available:  
@@ -86,6 +87,10 @@ Sample size: `N`, `Neff`
 If the Z-statistics is not present, it will be automatically calculated from effect size and standard error, in which case the following columns should be provided:     
 Effect-size: `b`, `beta`, `beta1` , `or`   
 Standard error:  `se`, `std`    
+
+To perform distance-pruning of instruments, the following columns must also be present:    
+chromosome:  `chr`         
+position:  `pos`   
 
 *If (at least) one of the datasets is coming from a case-control GWAS:*    
 ... the Sample size column should correspond to the total sample size (not the effective sample size!!).  
@@ -171,10 +176,10 @@ A = MRlap(exposure = BMI,
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
         "    corrected effect: 0.115 ( 0.0535 ) \n",
-        "    covariance between observed and corrected effect: 0.002154   \n",
-        "          5000 simulations were used to estimate the variance and the covariance.\n",
+        "    covariance between observed and corrected effect: 0.00209   \n",
+        "          7000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  1  second(s). \n")
+        "Runtime of the analysis:  2  minute(s) and  19  second(s). \n")
     ```
 
     
@@ -242,11 +247,11 @@ B = MRlap(exposure = SmallExposure_Data,
         "<<< Estimating corrected effect >>>   \n",
         "> Estimating genetic architecture parameters...  \n",
         "> Estimating corrected effect...  \n",
-        "    corrected effect: 0.199 ( 0.0266 ) \n",
-        "    covariance between observed and corrected effect: 0.000625  \n",
-        "          10000 simulations were used to estimate the variance and the covariance.\n",
+        "    corrected effect: 0.199 ( 0.0263 ) \n",
+        "    covariance between observed and corrected effect: 0.000615  \n",
+        "          5000 simulations were used to estimate the variance and the covariance.\n",
         "> Testing difference between observed and corrected effect...  \n",
-        "Runtime of the analysis:  3  minute(s) and  47  second(s). \n")
+        "Runtime of the analysis:  4  minute(s) and  24  second(s). \n")
     ```
 
     
@@ -333,9 +338,9 @@ unlist(B[["GeneticArchitecture"]])
 ## Runtime
 [//]:*******
 
-Example A ~ 3 minutes 40 seconds
+Example A ~ 2 minutes 19 seconds
 
-Example B ~ 3 minutes 35 seconds
+Example B ~ 4 minutes 24 seconds
 
 The runtime can be influenced by the size of the summary statistics files, the approach used for pruning (distance vs LD) but also by the number of simulations used for the sampling strategy to estimate the variance of the corrected causal effect and the covariance between observed and corrected effects (optimal number of simulations is automatically determined in the analysis).
 
@@ -343,15 +348,19 @@ The runtime can be influenced by the size of the summary statistics files, the a
 <font color="grey"><small> Results from analyses performed on a MacBook Pro (2020) - Processor : 2 GHz Quad-Core Intel Core i5 - Memory : 16 GB 3733 MHz LPDDR4X.</font> </small>    
 
 
+## Contributors
+
+A huge thanks to the people helping with `MRlap` improvements!   
+
+[Luke Pilling](https://github.com/lukepilling)   
+
 
 ## Citation
 [//]:*******
 
-- to be added -    
-Note that some of the scripts used to perform the analyses presented in the paper are available [here](https://github.com/n-mounier/MRlap_Analyses).    
-<!--- If you use the `MRlap` package, please cite:
-
-[Ninon Mounier, Zoltán Kutalik, bGWAS: an R package to perform Bayesian Genome Wide Association Studies, Bioinformatics](https://doi.org/10.1093/bioinformatics/btaa549) --->
+ If you use the `MRlap` package, please cite:
+[Ninon Mounier, Zoltán Kutalik, Bias correction for inverse variance weighting Mendelian randomization, Genetic Epidemiology](https://doi.org/10.1002/gepi.22522)     
+Note that some of the scripts used to perform the analyses presented in the paper are available [here](https://github.com/n-mounier/MRlap_Analyses).   
 
 ## Contact
 <mounier.ninon@gmail.com>

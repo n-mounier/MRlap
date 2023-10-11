@@ -40,11 +40,11 @@ Expects LD scores formated as required by the original LD score regression softw
 \item{hm3}{The path to a file of SNPs with alt, ref alleles and rsid used to allign alleles across traits
 (character)}
 
-\item{do_pruning}{A logical indicating MRlap should identify lead SNPs via pruning (if FALSE, the user should 
-  provide with user_SNPsToKeep,
+\item{do_pruning}{A logical indicating MRlap should identify lead SNPs via pruning (if FALSE, the user should
+  provide with user_SNPsToKeep, and all the MR_[...] parameters will be ignored),
 \code{default=TRUE}}
 
-\item{user_SNPsToKeep}{A vector of SNP RSIDs to use as the instrumental variables (only used if do_pruning==TRUE), 
+\item{user_SNPsToKeep}{A vector of SNP RSIDs to use as the instrumental variables (only used if do_pruning==FALSE),
 \code{default=""} (character)}
 
 \item{MR_threshold}{The threshold used to select strong instruments for MR, should be lower
@@ -59,10 +59,10 @@ than 1e-5, \code{default=5e-8} (numeric)}
 \item{MR_reverse}{The p-value used to exclude MR instruments that are more strongly associated with the outcome
 than with the exposure,\code{default=1e-3} (numeric)}
 
-\item{MR_plink}{A string. Path to Plink v1.90 binary (if left as NULL will not use local installation if LD pruning),
+\item{MR_plink}{The path to to Plink v1.90 binary (if left as NULL will not use local installation if LD pruning),
 \code{default=""} (character)}
 
-\item{MR_bfile}{A string. Path to appropriate BIM/BED reference panel files on your server,
+\item{MR_bfile}{The path to appropriate BIM/BED reference panel files on your server,
 \code{default=""} (character)}
 
 \item{save_logfiles}{A logical indicating if log files from LDSC should be saved,

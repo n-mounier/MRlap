@@ -1,8 +1,16 @@
-# MRlap 0.0.3.1 (2023-10-03)
+# MRlap 0.0.3.1 (2023-10-11)
 
 ## Changes
-- User can use local installation of Plink for LD clumping with a custom reference panel (using `MR_plink` and `MR_bfile` options)
-- User can turn of automatic pruning and instead provide own list of variants to use as Instrumental Variables (using `do_pruning` and `user_SNPsToKeep` options)
+
+- instrument selection:   
+
+User can use local installation of Plink for LD clumping with a custom reference panel (using `MR_plink` and `MR_bfile` options)    
+User can turn of automatic pruning and instead provide own list of variants to use as Instrumental Variables (using `do_pruning` and `user_SNPsToKeep` options)    
+
+- input data format   
+
+the chromosome and position columns are not needed anymore if LD pruning is performed using a local version of PLINK (still required for distance pruning, and for LD pruning using the API, to do it chromosome by chromosome and work with smaller subsets of SNPs).    
+As a consequence, the HLA region is not excluded by default before performing MR (if you prefer to exclude it, please do it before launching MRlap)
 
 
 # MRlap 0.0.3.0 (2022-11-18)
