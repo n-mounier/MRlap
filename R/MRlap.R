@@ -117,6 +117,8 @@ MRlap <- function(exposure,
     hm3 = normalizePath(hm3)
   } else stop("hm3 : wrong format, should be character", call. = FALSE)
 
+  ## default is to need the CHR:POS info. Only exception is if using local Plink clumping
+  need_chrpos=TRUE
 
   ## user-provided SNP list?
   if (!do_pruning){
@@ -145,7 +147,6 @@ MRlap <- function(exposure,
     if(MR_pruning_LD<0) stop("MR_pruning_LD : should be positive", call. = FALSE)
     if(MR_pruning_LD>1) stop("MR_pruning_LD : should not be larger than 1", call. = FALSE)
 
-    need_chrpos=TRUE
     if(MR_pruning_LD>0){
       if(verbose) cat("The LD threshold used for pruning MR instruments is:", MR_pruning_LD, "\n")
       if(!is.null(MR_plink)){
