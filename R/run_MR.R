@@ -156,10 +156,16 @@ run_MR <- function(exposure_data,
   TwoSampleMR::mr_ivw(data_pruned$std_beta.exp, data_pruned$std_beta.out,
                       data_pruned$std_SE.exp, data_pruned$std_SE.out) -> res_MR_TwoSampleMR
 
+  TwoSampleMR::mr_egger_regression(data_pruned$std_beta.exp, data_pruned$std_beta.out,
+                                   data_pruned$std_SE.exp, data_pruned$std_SE.out) -> res_MR_TwoSampleMR_Egger
+
   if(verbose) cat("   ",  "IVW-MR observed effect:", format(res_MR_TwoSampleMR$b, digits = 3), "(", format(res_MR_TwoSampleMR$se, digits=3), ")\n")
 
   return(list("alpha_obs" = res_MR_TwoSampleMR$b,
               "alpha_obs_se" = res_MR_TwoSampleMR$se,
+              "egger_b" = res_MR_TwoSampleMR_Egger$b,
+              "egger_se" = res_MR_TwoSampleMR_Egger$se,
+              "egger_intercept_p" = res_MR_TwoSampleMR_Egger$pval_i,
               "n_exp" = mean(data_pruned$N.exp),
               "n_out" = mean(data_pruned$N.out),
               "IVs" = data_pruned %>% dplyr::select(.data$std_beta.exp, .data$std_SE.exp),

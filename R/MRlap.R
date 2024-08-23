@@ -232,7 +232,10 @@ MRlap <- function(exposure,
                     "corrected_effect_se" = alpha_corrected_se,
                     "corrected_effect_p" = 2*stats::pnorm(-abs(alpha_corrected/alpha_corrected_se)),
                     "test_difference" = test_diff,
-                    "p_difference" = p_diff))
+                    "p_difference" = p_diff,
+                    "egger_b" = egger_b,
+                    "egger_se" = egger_se,
+                    "egger_intercept_p" = egger_intercept_p))
                     # number of simulations needed to estimate SE/COV s
 
   results_LDSC=with(LDSC_results,
