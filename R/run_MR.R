@@ -169,6 +169,7 @@ run_MR <- function(exposure_data,
               "n_exp" = mean(data_pruned$N.exp),
               "n_out" = mean(data_pruned$N.out),
               "IVs" = data_pruned %>% dplyr::select(.data$std_beta.exp, .data$std_SE.exp),
-              "IVs_rs" = data_pruned$rsid))
+              "IVs_rs" = data_pruned$rsid,
+              "data_pruned" = data_pruned))
 
 }

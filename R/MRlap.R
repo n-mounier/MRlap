@@ -257,7 +257,8 @@ MRlap <- function(exposure,
 
   results = list(MRcorrection = results_MR,
                  LDSC = results_LDSC,
-                 GeneticArchitecture = results_GeneticArchitecture)
+                 GeneticArchitecture = results_GeneticArchitecture,
+                 harmonised_mr_data = MR_results$data_pruned)
 
   return(results)
 }
