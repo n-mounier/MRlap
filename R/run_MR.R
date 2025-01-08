@@ -80,31 +80,40 @@ run_MR <- function(exposure_data,
     if(nrow(data_thresholded)==0) stop("no IV left after excluding IVs more strongly associated with the outcome than with the exposure")
 
     if(MR_pruning_LD>0){# LD-pruning
-      data_thresholded %>%
-        dplyr::transmute(SNP = .data$rsid,
-                         chr_name = .data$chr.exp,
-                         chr_start = .data$pos.exp,
-                         pval.exposure = .data$p.exp) -> ToPrune
 
       if(verbose) cat("   Pruning : distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
+	  
       # Do pruning
       SNPsToKeep = c()
+	  
       # use remote clumping?
       if(is.null(MR_plink)){
+      
+        data_thresholded %>%
+          dplyr::transmute(SNP = .data$rsid,
+                           chr_name = .data$chr.exp,
+                           chr_start = .data$pos.exp,
+                           pval.exposure = .data$p.exp) -> ToPrune
+
         for(chr in unique(ToPrune$chr_name)){
           SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
         }
+		
       } else { # use local clumping
         if(verbose) cat("Using ieugwasr::ld_clump with local PLINK")
         # need slightly different headers
-        ToPrune = ToPrune %>% dplyr::select(rsid = SNP, #chr = chr_name, pos = chr_start,
-                                            pval = pval.exposure)
+      
+        data_thresholded %>%
+          dplyr::transmute(rsid = .data$rsid,
+                           pval = .data$p.exp) -> ToPrune
+
         SNPsToKeep = ieugwasr::ld_clump(ToPrune,
                                         clump_kb = MR_pruning_dist,
                                         clump_r2 = MR_pruning_LD,
                                         plink_bin = MR_plink,
                                         bfile = MR_bfile)$rsid
       }
+	  
     } else{ # distance pruning
       data_thresholded %>%
         dplyr::transmute(SNP = .data$rsid,
