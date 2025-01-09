@@ -80,31 +80,40 @@ run_MR <- function(exposure_data,
     if(nrow(data_thresholded)==0) stop("no IV left after excluding IVs more strongly associated with the outcome than with the exposure")
 
     if(MR_pruning_LD>0){# LD-pruning
-      data_thresholded %>%
-        dplyr::transmute(SNP = .data$rsid,
-                         chr_name = .data$chr.exp,
-                         chr_start = .data$pos.exp,
-                         pval.exposure = .data$p.exp) -> ToPrune
 
       if(verbose) cat("   Pruning : distance : ", MR_pruning_dist, "Kb", " - LD threshold : ", MR_pruning_LD, "\n")
+	  
       # Do pruning
       SNPsToKeep = c()
+	  
       # use remote clumping?
       if(is.null(MR_plink)){
+      
+        data_thresholded %>%
+          dplyr::transmute(SNP = .data$rsid,
+                           chr_name = .data$chr.exp,
+                           chr_start = .data$pos.exp,
+                           pval.exposure = .data$p.exp) -> ToPrune
+
         for(chr in unique(ToPrune$chr_name)){
           SNPsToKeep = c(SNPsToKeep, suppressMessages(TwoSampleMR::clump_data(ToPrune[ToPrune$chr_name==chr,], clump_kb = MR_pruning_dist, clump_r2 = MR_pruning_LD)$SNP))
         }
+		
       } else { # use local clumping
         if(verbose) cat("Using ieugwasr::ld_clump with local PLINK")
         # need slightly different headers
-        ToPrune = ToPrune %>% dplyr::select(rsid = SNP, #chr = chr_name, pos = chr_start,
-                                            pval = pval.exposure)
+      
+        data_thresholded %>%
+          dplyr::transmute(rsid = .data$rsid,
+                           pval = .data$p.exp) -> ToPrune
+
         SNPsToKeep = ieugwasr::ld_clump(ToPrune,
                                         clump_kb = MR_pruning_dist,
                                         clump_r2 = MR_pruning_LD,
                                         plink_bin = MR_plink,
                                         bfile = MR_bfile)$rsid
       }
+	  
     } else{ # distance pruning
       data_thresholded %>%
         dplyr::transmute(SNP = .data$rsid,
@@ -156,13 +165,20 @@ run_MR <- function(exposure_data,
   TwoSampleMR::mr_ivw(data_pruned$std_beta.exp, data_pruned$std_beta.out,
                       data_pruned$std_SE.exp, data_pruned$std_SE.out) -> res_MR_TwoSampleMR
 
+  TwoSampleMR::mr_egger_regression(data_pruned$std_beta.exp, data_pruned$std_beta.out,
+                                   data_pruned$std_SE.exp, data_pruned$std_SE.out) -> res_MR_TwoSampleMR_Egger
+
   if(verbose) cat("   ",  "IVW-MR observed effect:", format(res_MR_TwoSampleMR$b, digits = 3), "(", format(res_MR_TwoSampleMR$se, digits=3), ")\n")
 
   return(list("alpha_obs" = res_MR_TwoSampleMR$b,
               "alpha_obs_se" = res_MR_TwoSampleMR$se,
+              "egger_b" = res_MR_TwoSampleMR_Egger$b,
+              "egger_se" = res_MR_TwoSampleMR_Egger$se,
+              "egger_intercept_p" = res_MR_TwoSampleMR_Egger$pval_i,
               "n_exp" = mean(data_pruned$N.exp),
               "n_out" = mean(data_pruned$N.out),
               "IVs" = data_pruned %>% dplyr::select(.data$std_beta.exp, .data$std_SE.exp),
-              "IVs_rs" = data_pruned$rsid))
+              "IVs_rs" = data_pruned$rsid,
+              "data_pruned" = data_pruned))
 
 }
