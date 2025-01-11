@@ -1,3 +1,26 @@
+# MRlap 0.0.3.4 (2025-01-11)
+
+## Changes
+
+- Update col names for the returned `harmonised_mr_data` object that contains the pruned and aligned instruments (this was not originally intended to be returned, so did not have consistent naming)
+
+
+# MRlap 0.0.3.3 (2025-01-09)
+
+## Changes
+
+- Add MR-Egger test to the output object 
+- Include the pruned and harmonised instruments in the output object
+- Fix `run_MR()` internal function (there was a `transmute()` function that still referenced CHR and POS even if not required)
+
+
+# MRlap 0.0.3.2 (2023-11-08)
+
+## Changes
+
+- Fix issue #12 - `need_chrpos` not correctly specified throughout following inclusion of local plink/reference options
+
+
 # MRlap 0.0.3.1 (2023-10-11)
 
 ## Changes

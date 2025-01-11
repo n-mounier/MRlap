@@ -1,6 +1,6 @@
 Package: MRlap
 Title: MRlap is an R-package to perform two-sample Mendelian Randomisation (MR) analyses using (potentially) overlapping samples
-Version: 0.0.3.3
+Version: 0.0.3.4
 Author: Ninon Mounier
 Maintainer: Ninon Mounier <mounier.ninon@gmail.com>
 Description: MR estimates can be subject to different types of biases due to the overlap between the exposure and outcome samples, the use of weak instruments and Winner’s curse. Our approach simultaneously accounts and corrects for all these biases, using cross-trait LD-score regression (LDSC) to approximate the overlap. It requires only GWAS summary statistics. Estimating the corrected effect using our approach can be performed as a sensitivity analysis: if the corrected effect do not significantly differ from the observed effect, then IVW-MR estimate can be safely used. However, when there is a significant difference, corrected effects should be preferred as they should be less biased, independently of the sample overlap.   
