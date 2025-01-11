@@ -217,6 +217,29 @@ MRlap <- function(exposure,
   seconds <- Time - minutes * 60
   if(verbose) cat("Runtime of the analysis: ", minutes, " minute(s) and ", seconds, " second(s).  \n")
 
+  # update pruned data variable names to be consistent with format required for TwoSampleMR::mr()
+  data_pruned <- MR_results$data_pruned |>
+    dplyr::rename(SNP=rsid, 
+                  effect_allele.exposure=alt.exp,
+                  other_allele.exposure=ref.exp,
+                  beta.exposure=std_beta.exp,
+                  se.exposure=std_SE.exp,
+                  beta.outcome=std_beta.out,
+                  se.outcome=std_SE.out) |>
+    dplyr::select(-alt.out, -ref.out) |>
+    dplyr::mutate(exposure=exposure_name,
+                  id.exposure=exposure_name,
+                  outcome=outcome_name,
+                  id.outcome=outcome_name,
+                  eaf.exposure=NA,
+                  eaf.outcome=NA,
+                  effect_allele.outcome=effect_allele.exposure,
+                  other_allele.outcome=other_allele.exposure,
+                  mr_keep=TRUE) |>
+    dplyr::relocate(exposure, id.exposure, outcome, id.outcome, .before=SNP) |>
+    dplyr::relocate(eaf.exposure, .after=other_allele.exposure) |>
+    dplyr::relocate(eaf.outcome, .after=other_allele.outcome) |>
+    dplyr::relocate(effect_allele.outcome, other_allele.outcome, .before=Z.out)
 
   # results -> list of 3
   # [[1]] "MR correction"
@@ -258,7 +281,7 @@ MRlap <- function(exposure,
   results = list(MRcorrection = results_MR,
                  LDSC = results_LDSC,
                  GeneticArchitecture = results_GeneticArchitecture,
-                 harmonised_mr_data = MR_results$data_pruned)
+                 harmonised_mr_data = data_pruned)
 
   return(results)
 }
